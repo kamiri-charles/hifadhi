@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignIn from './pages/sign-in';
 import { ThemeProvider } from "@/components/theme-provider";
-import './App.scss'
 import Landing from "./pages/landing";
 import SignUp from "./pages/sign-up";
+import Dashboard from "./pages/dashboard";
+import './App.scss'
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
 					<Route path="/" element={ <Landing />} />
 					<Route path="/sign-in" element={ <SignIn />} />
 					<Route path="/sign-up" element={ <SignUp />} />
+					<Route path="/dashboard" element={<Dashboard />} />
 				</Routes>
 			</Router>
 		</div>

@@ -14,7 +14,7 @@ const Navbar = () => {
 				<Button onClick={() => nav("/sign-in")} className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600">
 					Sign In
 				</Button>
-				<Button className="bg-indigo-800 text-white py-2 px-4 cursor-pointer hover:bg-blue-600">
+				<Button onClick={() => nav("/sign-up")} className="bg-indigo-800 text-white py-2 px-4 cursor-pointer hover:bg-blue-600">
 					Sign Up
 				</Button>
 			</div>
