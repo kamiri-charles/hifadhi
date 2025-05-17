@@ -1,6 +1,7 @@
 import { CloudUpload } from 'lucide-react'
 import { Button } from './ui/button'
 import { useNavigate } from 'react-router-dom';
+import { ModeToggle } from './mode-toggle';
 
 const Navbar = () => {
 	const nav = useNavigate();
@@ -18,6 +19,8 @@ const Navbar = () => {
 					Sign Up
 				</Button>
 			</div>
+
+			<ModeToggle />
 		</header>
 	);
 }
