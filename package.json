@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.4",
+    "@clerk/themes": "^2.2.45",
+    "@imagekit/react": "^5.0.1",
     "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-collapsible": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.13",

@@ -7,21 +7,25 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export function BreadcrumbsHeader() {
+interface BreadcrumbsHeaderProps {
+  selectedParentFolder: string | null,
+}
+
+export function BreadcrumbsHeader({selectedParentFolder}: BreadcrumbsHeaderProps) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">folder_name</BreadcrumbLink>
+          <span>{selectedParentFolder? selectedParentFolder: "/"}</span>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        {/* <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
       </BreadcrumbList>
     </Breadcrumb>
   )

@@ -6,6 +6,7 @@ import { SidebarProvider } from "./components/ui/sidebar";
 import Landing from "./pages/landing";
 import SignUpPage from "./pages/sign-up";
 import Dashboard from "./pages/dashboard";
+import { dark } from "@clerk/themes";
 import "./App.scss";
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
 	}
 
 	return (
-		<ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/sign-in">
+		<ClerkProvider appearance={{baseTheme: dark}} publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/sign-in">
 			<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 			<SidebarProvider>
 				<div className="App w-screen h-screen">

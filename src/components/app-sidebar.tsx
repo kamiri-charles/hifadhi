@@ -1,3 +1,4 @@
+import { type Dispatch, type SetStateAction } from "react";
 import { Folder, MoreHorizontal, Plus } from "lucide-react";
 
 import {
@@ -17,15 +18,20 @@ import { Button } from "./ui/button";
 
 // Menu items.
 const items = [
-	{title: "New Folder", icon: Folder}
+	{title: "New Folder", icon: Folder},
+	{title: "New Folder_2", icon: Folder},
+	{title: "New Folder_3", icon: Folder},
 	
 ];
 
 interface AppSidebarProps {
-	identifier: string
+	identifier: string;
+	selectedParentFolder: string | null;
+	setSelectedParentFolder: Dispatch<SetStateAction<string | null>>;
 }
 
-export function AppSidebar({identifier}: AppSidebarProps) {
+export function AppSidebar({identifier, selectedParentFolder, setSelectedParentFolder}: AppSidebarProps) {
+	
 	return (
 		<Sidebar className="mt-16" collapsible="icon">
 			<SidebarContent>
@@ -38,8 +44,8 @@ export function AppSidebar({identifier}: AppSidebarProps) {
 						{items.length > 0 ? (
 							<SidebarMenu>
 								{items.map((item) => (
-									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton asChild isActive>
+									<SidebarMenuItem className="cursor-pointer" key={item.title} onClick={() => setSelectedParentFolder(item.title)}>
+										<SidebarMenuButton asChild isActive={selectedParentFolder === item.title}>
 											<div>
 												<item.icon />
 												<span>{item.title}</span>
@@ -48,7 +54,7 @@ export function AppSidebar({identifier}: AppSidebarProps) {
 
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<SidebarMenuAction>
+												<SidebarMenuAction className="cursor-pointer">
 													<MoreHorizontal />
 												</SidebarMenuAction>
 											</DropdownMenuTrigger>
