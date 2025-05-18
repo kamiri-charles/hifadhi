@@ -13,13 +13,11 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { Button } from "./ui/button";
 
 // Menu items.
 const items = [
-	{
-		title: "Folder 1",
-		icon: Folder,
-	},
+	{title: "New Folder", icon: Folder}
 	
 ];
 
@@ -37,34 +35,43 @@ export function AppSidebar({identifier}: AppSidebarProps) {
 						<Plus /> <span className="sr-only">New Folder</span>
 					</SidebarGroupAction>
 					<SidebarGroupContent>
-						<SidebarMenu>
-							{items.map((item) => (
-								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild isActive>
-										<div>
-											<item.icon />
-											<span>{item.title}</span>
-										</div>
-									</SidebarMenuButton>
+						{items.length > 0 ? (
+							<SidebarMenu>
+								{items.map((item) => (
+									<SidebarMenuItem key={item.title}>
+										<SidebarMenuButton asChild isActive>
+											<div>
+												<item.icon />
+												<span>{item.title}</span>
+											</div>
+										</SidebarMenuButton>
 
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<SidebarMenuAction>
-												<MoreHorizontal />
-											</SidebarMenuAction>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent side="right" align="start">
-											<DropdownMenuItem>
-												<span>Edit Project</span>
-											</DropdownMenuItem>
-											<DropdownMenuItem>
-												<span>Delete Project</span>
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<SidebarMenuAction>
+													<MoreHorizontal />
+												</SidebarMenuAction>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent side="right" align="start">
+												<DropdownMenuItem>
+													<span>Rename</span>
+												</DropdownMenuItem>
+												<DropdownMenuItem>
+													<span>Delete</span>
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						) : (
+							<div className="flex flex-col items-center justify-center gap-2 mt-40">
+								<span>Folder? I hardly know her!</span>
+								<Button className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600">
+									New Folder
+								</Button>
+							</div>
+						)}
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
