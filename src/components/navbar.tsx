@@ -2,20 +2,27 @@ import { CloudUpload } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { ModeToggle } from "./mode-toggle";
-import { useState } from "react";
 import { CustomSidebarTrigger } from "./custom-sidebar-trigger";
+import {
+	SignedIn,
+	SignedOut,
+	useAuth,
+	UserButton,
+} from "@clerk/clerk-react";
 
 const Navbar = () => {
+	const {isSignedIn} = useAuth();
 	const nav = useNavigate();
-	const [signedIn, setSignedIn] = useState(false);
 	return (
 		<header className="flex items-center justify-between fixed top-0 left-0 w-full py-4 px-20 border-b-2">
 			<div className="flex items-center gap-2">
-				<CustomSidebarTrigger />
+				{isSignedIn ? <CustomSidebarTrigger /> : null}
+				
 				<CloudUpload size={30} />
 				<h2 className="text-2xl">Hifadhi</h2>
 			</div>
-			{signedIn ? (
+
+			<SignedOut>
 				<div className="flex gap-10">
 					<Button
 						onClick={() => nav("/sign-in")}
@@ -30,7 +37,11 @@ const Navbar = () => {
 						Sign Up
 					</Button>
 				</div>
-			) : null}
+			</SignedOut>
+
+			<SignedIn>
+				<UserButton />
+			</SignedIn>
 
 			<ModeToggle />
 		</header>

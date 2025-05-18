@@ -1,11 +1,17 @@
-import Navbar from "@/components/navbar"
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Cloud, Folder, Layers, Shield, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import Navbar from "@/components/navbar";
 
 const Landing = () => {
-    const nav = useNavigate();
-  return (
+	const nav = useNavigate();
+	const { isSignedIn, isLoaded } = useAuth();
+	useEffect(() => {
+		if (isSignedIn && isLoaded) nav("/dashboard");
+	}, [isSignedIn, isLoaded]);
+	return (
 		<div className="w-full h-full flex items-center justify-around px-10 relative isolate overflow-hidden bg-white/5 py-24 sm:py-32">
 			<Navbar />
 
@@ -14,10 +20,16 @@ const Landing = () => {
 				<span>Simple. Secure. Fase</span>
 
 				<div className="flex gap-4 mt-8">
-					<Button onClick={() => nav("/sign-up")} className="bg-blue-800 text-white py-5 cursor-pointer hover:bg-blue-600">
+					<Button
+						onClick={() => nav("/sign-up")}
+						className="bg-blue-800 text-white py-5 cursor-pointer hover:bg-blue-600"
+					>
 						Get Started
 					</Button>
-					<Button onClick={() => nav("/sign-in")} className="bg-blue-800 text-white py-5 px-4 cursor-pointer hover:bg-blue-600">
+					<Button
+						onClick={() => nav("/sign-in")}
+						className="bg-blue-800 text-white py-5 px-4 cursor-pointer hover:bg-blue-600"
+					>
 						Sign In
 					</Button>
 				</div>
@@ -92,6 +104,6 @@ const Landing = () => {
 			></div>
 		</div>
 	);
-}
+};
 
-export default Landing
+export default Landing;
