@@ -1,28 +1,40 @@
-import { CloudUpload } from 'lucide-react'
-import { Button } from './ui/button'
-import { useNavigate } from 'react-router-dom';
-import { ModeToggle } from './mode-toggle';
+import { CloudUpload } from "lucide-react";
+import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
+import { ModeToggle } from "./mode-toggle";
+import { useState } from "react";
+import { CustomSidebarTrigger } from "./custom-sidebar-trigger";
 
 const Navbar = () => {
 	const nav = useNavigate();
-  return (
+	const [signedIn, setSignedIn] = useState(false);
+	return (
 		<header className="flex items-center justify-between fixed top-0 left-0 w-full py-4 px-20 border-b-2">
-      <div className="flex items-center gap-2">
-        <CloudUpload size={30} />
-        <h2 className="text-2xl">Hifadhi</h2>
-      </div>
-			<div className="flex gap-10">
-				<Button onClick={() => nav("/sign-in")} className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600">
-					Sign In
-				</Button>
-				<Button onClick={() => nav("/sign-up")} className="bg-indigo-800 text-white py-2 px-4 cursor-pointer hover:bg-blue-600">
-					Sign Up
-				</Button>
+			<div className="flex items-center gap-2">
+				<CustomSidebarTrigger />
+				<CloudUpload size={30} />
+				<h2 className="text-2xl">Hifadhi</h2>
 			</div>
+			{signedIn ? (
+				<div className="flex gap-10">
+					<Button
+						onClick={() => nav("/sign-in")}
+						className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600"
+					>
+						Sign In
+					</Button>
+					<Button
+						onClick={() => nav("/sign-up")}
+						className="bg-indigo-800 text-white py-2 px-4 cursor-pointer hover:bg-blue-600"
+					>
+						Sign Up
+					</Button>
+				</div>
+			) : null}
 
 			<ModeToggle />
 		</header>
 	);
-}
+};
 
-export default Navbar
+export default Navbar;

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignIn from './pages/sign-in';
 import { ThemeProvider } from "@/components/theme-provider";
+import { SidebarProvider } from "./components/ui/sidebar";
 import Landing from "./pages/landing";
 import SignUp from "./pages/sign-up";
 import Dashboard from "./pages/dashboard";
@@ -10,7 +11,8 @@ function App() {
 
   return (
 	<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-		<div className='App'>
+		<SidebarProvider>
+			<div className='App w-screen h-screen'>
 			<Router>
 				<Routes>
 					<Route path="/" element={ <Landing />} />
@@ -20,6 +22,8 @@ function App() {
 				</Routes>
 			</Router>
 		</div>
+		</SidebarProvider>
+		
 	</ThemeProvider>
 	
 	);
