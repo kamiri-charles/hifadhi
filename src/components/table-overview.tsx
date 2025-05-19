@@ -20,6 +20,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { getFilesAndFolders } from "@/api/folders";
 import { toast } from "sonner";
+import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 
 
 interface TableOverviewProps {
@@ -30,14 +31,18 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const {user, isLoaded} = useUser();
+	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders, [selectedRootFolder?.id]);
+
 
 	const fetchChildren = useCallback(async () => {
+		console.log("Fetching children")
 		if (!user?.id) return;
 		setLoading(true);
 
 		try {
 			const userId = user.id;
-			const children = await getFilesAndFolders({ userId, parentFolderId: selectedRootFolder?.id });
+			console.log(selectedRootFolder?.id);
+			const children = await getFilesAndFolders({ userId, parentFolderId: selectedRootFolder?.id }); // Bug - Sometimes fetches the root folders
 			setFilesAndFolders(children);
 			toast("Fetch successful", {
 				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)],
@@ -56,14 +61,14 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 		} finally {
 			setLoading(false);
 		}
-	}, [user?.id]);
+	}, [user?.id, selectedRootFolder?.id]);
 
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 
 		if (selectedRootFolder) fetchChildren();
 
-	}, [isLoaded, user?.id, fetchChildren]);
+	}, [isLoaded, user?.id, selectedRootFolder, fetchChildren]);
 
 	if (!selectedRootFolder) {
 		return (
@@ -87,9 +92,7 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 	// Empty folder
 	if (selectedRootFolder && !loading && filesAndFolders.length === 0) {
 		return (
-			<div className="font-medium mt-40 text-center">
-				{empty_folder_placeholders[Math.floor(Math.random() * empty_folder_placeholders.length)]}
-			</div>
+			<div className="font-medium mt-40 text-center">{emptyFolderPlaceholder}</div>
 		);
 	}
 

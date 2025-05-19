@@ -9,22 +9,22 @@ interface CreateFolderProps {
 	parentId?: string | null;
 }
 
-interface GetFoldersProps {
+interface GetFilesAndFoldersProps {
 	userId: string;
 	parentFolderId?: string | null;
 }
 
+
 export async function getFilesAndFolders({
 	userId,
 	parentFolderId = null,
-}: GetFoldersProps) {
+}: GetFilesAndFoldersProps) {
 	const folders = await db
 		.select()
 		.from(files)
 		.where(
 			and(
 				eq(files.userId, userId),
-				eq(files.isFolder, true),
 				parentFolderId === null
 					? isNull(files.parentId)
 					: eq(files.parentId, parentFolderId)

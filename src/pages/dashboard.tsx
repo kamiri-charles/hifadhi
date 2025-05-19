@@ -6,15 +6,27 @@ import { BreadcrumbsHeader } from "@/components/breadcrumbs-header";
 import Navbar from "@/components/navbar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FolderPlus, Search } from "lucide-react";
+import { Check, FolderPlus, Search } from "lucide-react";
 import { TableOverview } from "@/components/table-overview";
 import { toast } from "sonner";
 import type { File } from "@/db/schema";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
 
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
 	const [selectedRootFolder, setSelectedRootFolder] = useState<File | null>(null);
+	//const [folderNavArr, setFolderNavArr] = useState<string[]>([]);
+	const [subFolderName, setSubFolderName] = useState<string>("");
+
+	const handleCreate = () => {
+		if (subFolderName.trim()) {
+			// Call your createFolder logic here
+			console.log("Creating folder:", subFolderName);
+			setSubFolderName("");
+		}
+	};
 
 	useEffect(() => {
 		if (!isLoaded) return;
@@ -43,13 +55,38 @@ const Dashboard = () => {
 						>
 							Upload
 						</Button>
-						<Button
-							size="icon"
-							className="text-white bg-indigo-800 rounded-full cursor-pointer hover:bg-blue-600"
-							onClick={() => toast("This feature is under development.")} // TODO - Work on this functionality
-						>
-							<FolderPlus />
-						</Button>
+
+						<Popover>
+							<PopoverTrigger>
+								<Button
+									size="icon"
+									className="text-white bg-indigo-800 rounded-full hover:bg-blue-600"
+								>
+									<FolderPlus />
+								</Button>
+							</PopoverTrigger>
+
+							<PopoverContent className="w-64 p-4">
+								<div className="flex items-center gap-2">
+									<Input
+										placeholder="Folder name"
+										value={subFolderName}
+										onChange={(e) => setSubFolderName(e.target.value)}
+										className="flex-1 border-b border-muted rounded outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+									/>
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={handleCreate}
+										disabled={!subFolderName.trim()}
+										className="rounded-full cursor-pointer"
+									>
+										<Check className="w-4 h-4" />
+									</Button>
+								</div>
+							</PopoverContent>
+						</Popover>
+
 						<Input placeholder="Search" className="w-xs" />
 						<Button
 							className="cursor-pointer rounded-full"
@@ -59,7 +96,7 @@ const Dashboard = () => {
 							<Search />
 						</Button>
 					</div>
-				): null}
+				) : null}
 
 				<TableOverview selectedRootFolder={selectedRootFolder} />
 			</div>
