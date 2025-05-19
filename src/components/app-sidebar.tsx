@@ -12,6 +12,7 @@ import {
 	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	useSidebar,
 } from "@/components/ui/sidebar";
 import {
 	DropdownMenu,
@@ -38,12 +39,13 @@ export function AppSidebar({
 	selectedRootFolderId,
 	setSelectedRootFolderId,
 }: AppSidebarProps) {
+	const { state } = useSidebar();
+	const { user, isLoaded } = useUser();
 	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
 	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] = useState(false);
-	const [newFolderName, setNewFolderName] = useState("");
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
-	const { user, isLoaded } = useUser();
+	const [newFolderName, setNewFolderName] = useState("");
 
 	const handleCreateFolder = async () => {
 		if (!user?.id || !newFolderName.trim()) return;
@@ -121,9 +123,9 @@ export function AppSidebar({
 						</SidebarGroupAction>
 					)}
 
-					{gettingFolders ? (
+					{gettingFolders && state == "expanded" ? (
 						<div className="flex flex-col items-center mt-20 justify-center text-center">
-							<Loader2 size={40} className="animate-spin" />
+							<Loader2 size={30} className="animate-spin" />
 							<span className="text-3xs">
 								Hold tight, your folders are being... re-foldered
 							</span>
@@ -207,7 +209,7 @@ export function AppSidebar({
 								</SidebarMenu>
 							) : (
 								<>
-									{creatingFolder ? null : (
+									{creatingFolder || state == "collapsed" ? null : (
 										<div className="flex flex-col items-center justify-center gap-2 mt-40">
 											<span>Folder? I hardly know her!</span>
 											<Button

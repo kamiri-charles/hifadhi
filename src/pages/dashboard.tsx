@@ -12,13 +12,14 @@ import { toast } from "sonner";
 
 const Dashboard = () => {
 	const nav = useNavigate();
-	const { isSignedIn } = useAuth();
-	const { user } = useUser();
+	const { user, isSignedIn, isLoaded } = useUser();
 	const [selectedRootFolderId, setSelectedRootFolderId] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (!isLoaded) return;
 		if (!isSignedIn) nav("/sign-in");
-	}, []);
+	}, [isLoaded, isSignedIn, nav]);
+
 	return (
 		<div className="flex mt-16 h-full">
 			<Navbar />
