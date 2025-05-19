@@ -24,17 +24,18 @@ import { Input } from "./ui/input";
 import type { File } from "@/db/schema";
 import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
+import { toast } from "sonner";
 
 interface AppSidebarProps {
 	identifier: string;
-	selectedParentFolder: string | null;
-	setSelectedParentFolder: Dispatch<SetStateAction<string | null>>;
+	selectedRootFolderId: string | null;
+	setSelectedRootFolderId: Dispatch<SetStateAction<string | null>>;
 }
 
 export function AppSidebar({
 	identifier,
-	selectedParentFolder,
-	setSelectedParentFolder,
+	selectedRootFolderId,
+	setSelectedRootFolderId,
 }: AppSidebarProps) {
 	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
@@ -62,7 +63,13 @@ export function AppSidebar({
 			setRootFolders(refreshed);
 		} catch (error) {
 			console.error("Failed to create folder:", error);
-			// Optionally show toast or error UI here
+			toast("There was an error creating the folder.", {
+				description: "Description",
+				action: {
+					label: "Okay",
+					onClick: () => console.log("Okay"),
+				},
+			});
 		} finally {
 			setFolderCreationLoaderVisible(false);
 		}
@@ -80,6 +87,13 @@ export function AppSidebar({
 				setRootFolders(folders);
 			} catch (error) {
 				console.error("Error fetching root folders:", error);
+				toast("There was an error getting your folders", {
+					description: "The database might be offline",
+					action: {
+						label: "Try Again",
+						onClick: () => console.log("Try again")
+					}
+				})
 			} finally {
 				setGettingFolders(false);
 			}
@@ -157,11 +171,11 @@ export function AppSidebar({
 										<SidebarMenuItem
 											className="cursor-pointer"
 											key={folder.name}
-											onClick={() => setSelectedParentFolder(folder.name)}
+											onClick={() => setSelectedRootFolderId(folder.id)}
 										>
 											<SidebarMenuButton
 												asChild
-												isActive={selectedParentFolder === folder.name}
+												isActive={selectedRootFolderId === folder.id}
 											>
 												<div>
 													<Folder />

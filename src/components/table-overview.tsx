@@ -24,11 +24,11 @@ const testData = [
 ];
 
 interface TableOverviewProps {
-	selectedParentFolder: string | null;
+	selectedRootFolderId: string | null;
 }
 
-export function TableOverview({ selectedParentFolder }: TableOverviewProps) {
-	if (selectedParentFolder && testData.length > 0) {
+export function TableOverview({ selectedRootFolderId }: TableOverviewProps) {
+	if (selectedRootFolderId && testData.length > 0) {
 		return (
 			<Table>
 				<TableHeader>
@@ -80,7 +80,7 @@ export function TableOverview({ selectedParentFolder }: TableOverviewProps) {
 		);
 	}
 
-	if (selectedParentFolder && testData.length === 0) {
+	if (selectedRootFolderId && testData.length === 0) {
 		return (
 			<div className="font-medium mt-20 text-center">
 				This folder is running on pure potential energy.
@@ -88,9 +88,9 @@ export function TableOverview({ selectedParentFolder }: TableOverviewProps) {
 		);
 	}
 
-	if (!selectedParentFolder) {
+	if (!selectedRootFolderId) {
 		return (
-			<div className="font-medium mt-20 text-center">
+			<div className="font-medium mt-40 text-center">
 				Fold me once, shame on you. Fold me twice—well, just pick a folder
 				already!
 			</div>

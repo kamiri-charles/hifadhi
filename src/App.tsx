@@ -6,6 +6,7 @@ import { SidebarProvider } from "./components/ui/sidebar";
 import Landing from "./pages/landing";
 import SignUpPage from "./pages/sign-up";
 import Dashboard from "./pages/dashboard";
+import { Toaster } from "./components/ui/sonner";
 import { dark } from "@clerk/themes";
 import "./App.scss";
 
@@ -31,6 +32,7 @@ function App() {
 					</Router>
 				</div>
 			</SidebarProvider>
+			<Toaster />
 		</ThemeProvider>
 		</ClerkProvider>
 		
