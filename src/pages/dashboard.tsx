@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BreadcrumbsHeader } from "@/components/breadcrumbs-header";
@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { FolderPlus, Search } from "lucide-react";
 import { TableOverview } from "@/components/table-overview";
 import { toast } from "sonner";
+import type { File } from "@/db/schema";
 
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
-	const [selectedRootFolderId, setSelectedRootFolderId] = useState<string | null>(null);
+	const [selectedRootFolder, setSelectedRootFolder] = useState<File | null>(null);
 
 	useEffect(() => {
 		if (!isLoaded) return;
@@ -27,14 +28,14 @@ const Dashboard = () => {
 				identifier={
 					user?.username || user?.primaryEmailAddress?.emailAddress || "user"
 				}
-				selectedRootFolderId={selectedRootFolderId}
-				setSelectedRootFolderId={setSelectedRootFolderId}
+				selectedRootFolder={selectedRootFolder}
+				setSelectedRootFolder={setSelectedRootFolder}
 			/>
 
 			<div className="flex-1 h-full p-4">
-				<BreadcrumbsHeader selectedParentFolder={selectedRootFolderId} />
+				<BreadcrumbsHeader selectedRootFolder={selectedRootFolder} />
 
-				{selectedRootFolderId ? (
+				{selectedRootFolder ? (
 					<div className="flex justify-end gap-2">
 						<Button
 							className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600"
@@ -60,7 +61,7 @@ const Dashboard = () => {
 					</div>
 				): null}
 
-				<TableOverview selectedRootFolderId={selectedRootFolderId} />
+				<TableOverview selectedRootFolder={selectedRootFolder} />
 			</div>
 		</div>
 	);

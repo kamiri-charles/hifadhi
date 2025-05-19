@@ -11,12 +11,12 @@ interface CreateFolderProps {
 
 interface GetFoldersProps {
 	userId: string;
-	folderParentId?: string | null;
+	parentFolderId?: string | null;
 }
 
 export async function getFilesAndFolders({
 	userId,
-	folderParentId = null,
+	parentFolderId = null,
 }: GetFoldersProps) {
 	const folders = await db
 		.select()
@@ -25,9 +25,9 @@ export async function getFilesAndFolders({
 			and(
 				eq(files.userId, userId),
 				eq(files.isFolder, true),
-				folderParentId === null
+				parentFolderId === null
 					? isNull(files.parentId)
-					: eq(files.parentId, folderParentId)
+					: eq(files.parentId, parentFolderId)
 			)
 		)
 		.orderBy(files.name);

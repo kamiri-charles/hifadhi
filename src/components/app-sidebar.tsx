@@ -26,18 +26,18 @@ import type { File } from "@/db/schema";
 import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
-import { db_offline_placeholders, fetch_success_placeholders } from "@/assets/punny_placeholders";
+import { db_offline_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
 
 interface AppSidebarProps {
 	identifier: string;
-	selectedRootFolderId: string | null;
-	setSelectedRootFolderId: Dispatch<SetStateAction<string | null>>;
+	selectedRootFolder: File | null;
+	setSelectedRootFolder: Dispatch<SetStateAction<File | null>>;
 }
 
 export function AppSidebar({
 	identifier,
-	selectedRootFolderId,
-	setSelectedRootFolderId,
+	selectedRootFolder,
+	setSelectedRootFolder,
 }: AppSidebarProps) {
 	const { state } = useSidebar();
 	const { user, isLoaded } = useUser();
@@ -124,10 +124,10 @@ export function AppSidebar({
 					)}
 
 					{gettingFolders && state == "expanded" ? (
-						<div className="flex flex-col items-center mt-20 justify-center text-center">
+						<div className="flex flex-col items-center mt-40 justify-center text-center gap-2">
 							<Loader2 size={30} className="animate-spin" />
-							<span className="text-3xs">
-								Hold tight, your folders are being... re-foldered
+							<span className="font-medium">
+								{loading_placeholders[Math.floor(Math.random() * loading_placeholders.length)]}
 							</span>
 						</div>
 					) : (
@@ -177,11 +177,11 @@ export function AppSidebar({
 										<SidebarMenuItem
 											className="cursor-pointer"
 											key={folder.name}
-											onClick={() => setSelectedRootFolderId(folder.id)}
+											onClick={() => setSelectedRootFolder(folder)}
 										>
 											<SidebarMenuButton
 												asChild
-												isActive={selectedRootFolderId === folder.id}
+												isActive={selectedRootFolder?.id === folder.id}
 											>
 												<div>
 													<Folder />

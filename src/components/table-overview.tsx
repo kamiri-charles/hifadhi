@@ -10,26 +10,91 @@ import {
 	Download,
 	EllipsisVertical,
 	Folder,
+	Loader2,
 	Trash,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { empty_folder_placeholders } from "@/assets/punny_placeholders";
+import { db_offline_placeholders, empty_folder_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
+import type { File } from "@/db/schema";
+import { useCallback, useEffect, useState } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { getFilesAndFolders } from "@/api/folders";
+import { toast } from "sonner";
 
-const testData = [
-	{
-    name: "Sub Folder 1",
-    type: "folder",
-    created: "1/1/2025",
-    size: "0kb",
-  },
-];
 
 interface TableOverviewProps {
-	selectedRootFolderId: string | null;
+	selectedRootFolder: File | null;
 }
 
-export function TableOverview({ selectedRootFolderId }: TableOverviewProps) {
-	if (selectedRootFolderId && testData.length > 0) {
+export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
+	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
+	const [loading, setLoading] = useState(true);
+	const {user, isLoaded} = useUser();
+
+	const fetchChildren = useCallback(async () => {
+		if (!user?.id) return;
+		setLoading(true);
+
+		try {
+			const userId = user.id;
+			const children = await getFilesAndFolders({ userId, parentFolderId: selectedRootFolder?.id });
+			setFilesAndFolders(children);
+			toast("Fetch successful", {
+				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)],
+			});
+
+		} catch (error) {
+			console.error("Error getting files:", error);
+			toast("There was an error getting your files", {
+				description:
+					db_offline_placeholders[Math.floor(Math.random() * db_offline_placeholders.length)],
+				action: {
+					label: "Try Again",
+					onClick: fetchChildren,
+				},
+			});
+		} finally {
+			setLoading(false);
+		}
+	}, [user?.id]);
+
+	useEffect(() => {
+		if (!isLoaded || !user?.id) return;
+
+		if (selectedRootFolder) fetchChildren();
+
+	}, [isLoaded, user?.id, fetchChildren]);
+
+	if (!selectedRootFolder) {
+		return (
+			<div className="font-medium mt-40 text-center">
+				Fold me once, shame on you. Fold me twice—well, just pick a folder
+				already!
+			</div>
+		);
+	}
+
+	// Loading
+	if (selectedRootFolder && loading) {
+		return (
+			<div className="flex flex-col items-center mt-40 text-center gap-2 font-medium">
+				<Loader2 size={30} className="animate-spin" />
+				<span>{loading_placeholders[Math.floor(Math.random() * loading_placeholders.length)]}</span>
+			</div>
+		)
+	}
+
+	// Empty folder
+	if (selectedRootFolder && !loading && filesAndFolders.length === 0) {
+		return (
+			<div className="font-medium mt-40 text-center">
+				{empty_folder_placeholders[Math.floor(Math.random() * empty_folder_placeholders.length)]}
+			</div>
+		);
+	}
+
+	// Content
+	if (selectedRootFolder && !loading && filesAndFolders.length > 0) {
 		return (
 			<Table>
 				<TableHeader>
@@ -42,14 +107,14 @@ export function TableOverview({ selectedRootFolderId }: TableOverviewProps) {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{testData.map((data) => (
+					{filesAndFolders.map((data) => (
 						<TableRow key={data.name}>
 							<TableCell className="flex items-center gap-2">
 								<Folder />
 								{data.name}
 							</TableCell>
 							<TableCell>{data.type}</TableCell>
-							<TableCell>{data.created}</TableCell>
+							<TableCell>{data.createdAt.toISOString()}</TableCell>
 							<TableCell>{data.size}</TableCell>
 							<TableCell className="text-right">
 								<Button
@@ -78,23 +143,6 @@ export function TableOverview({ selectedRootFolderId }: TableOverviewProps) {
 					))}
 				</TableBody>
 			</Table>
-		);
-	}
-
-	if (selectedRootFolderId && testData.length === 0) {
-		return (
-			<div className="font-medium mt-20 text-center">
-				{empty_folder_placeholders[Math.floor(Math.random() * empty_folder_placeholders.length)]}
-			</div>
-		);
-	}
-
-	if (!selectedRootFolderId) {
-		return (
-			<div className="font-medium mt-40 text-center">
-				Fold me once, shame on you. Fold me twice—well, just pick a folder
-				already!
-			</div>
 		);
 	}
 }
