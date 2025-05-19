@@ -6,7 +6,7 @@ import { BreadcrumbsHeader } from "@/components/breadcrumbs-header"
 import Navbar from "@/components/navbar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
+import { FolderPlus, Search } from "lucide-react"
 import { TableOverview } from "@/components/table-overview"
 
 const Dashboard = () => {
@@ -19,24 +19,43 @@ const Dashboard = () => {
     if (!isSignedIn) nav("/sign-in");
   }, []);
   return (
-    <div className="flex mt-16 h-full">
-        <Navbar />
-        <AppSidebar identifier={user?.username || user?.primaryEmailAddress?.emailAddress || "user"} selectedParentFolder={selectedParentFolder} setSelectedParentFolder={setSelectedParentFolder} />
+		<div className="flex mt-16 h-full">
+			<Navbar />
+			<AppSidebar
+				identifier={
+					user?.username || user?.primaryEmailAddress?.emailAddress || "user"
+				}
+				selectedParentFolder={selectedParentFolder}
+				setSelectedParentFolder={setSelectedParentFolder}
+			/>
 
-        <div className="flex-1 h-full p-4">
-          <BreadcrumbsHeader selectedParentFolder={selectedParentFolder} />
+			<div className="flex-1 h-full p-4">
+				<BreadcrumbsHeader selectedParentFolder={selectedParentFolder} />
 
-          <div className="flex justify-end gap-1">
-            <Input placeholder="Search" className="w-xs" />
-            <Button className="cursor-pointer rounded-full" variant="ghost" size="icon"><Search></Search></Button>
-          </div>
+				<div className="flex justify-end gap-2">
+					<Button className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600">
+						Upload
+					</Button>
+					<Button
+						size="icon"
+						className="text-white bg-indigo-800 rounded-full cursor-pointer hover:bg-blue-600"
+					>
+						<FolderPlus />
+					</Button>
+					<Input placeholder="Search" className="w-xs" />
+					<Button
+						className="cursor-pointer rounded-full"
+						variant="ghost"
+						size="icon"
+					>
+						<Search />
+					</Button>
+				</div>
 
-          <TableOverview selectedParentFolder={selectedParentFolder} />
-        </div>
-
-
-    </div>
-  )
+				<TableOverview selectedParentFolder={selectedParentFolder} />
+			</div>
+		</div>
+	);
 }
 
 export default Dashboard
