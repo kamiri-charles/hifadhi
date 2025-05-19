@@ -13,6 +13,7 @@ import {
 	Trash,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { empty_folder_placeholders } from "@/assets/punny_placeholders";
 
 const testData = [
 	{
@@ -83,7 +84,7 @@ export function TableOverview({ selectedRootFolderId }: TableOverviewProps) {
 	if (selectedRootFolderId && testData.length === 0) {
 		return (
 			<div className="font-medium mt-20 text-center">
-				This folder is running on pure potential energy.
+				{empty_folder_placeholders[Math.floor(Math.random() * empty_folder_placeholders.length)]}
 			</div>
 		);
 	}

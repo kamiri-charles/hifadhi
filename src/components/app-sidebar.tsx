@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction, useEffect } from "react";
+import { useState, type Dispatch, type SetStateAction, useEffect, useCallback } from "react";
 import { Check, Folder, Loader2, MoreHorizontal, Plus, X } from "lucide-react";
 
 import {
@@ -25,6 +25,7 @@ import type { File } from "@/db/schema";
 import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
+import { db_offline_placeholders, fetch_success_placeholders } from "@/assets/punny_placeholders";
 
 interface AppSidebarProps {
 	identifier: string;
@@ -59,7 +60,7 @@ export function AppSidebar({
 			setCreatingFolder(false);
 
 			// Re-fetch folders
-			const refreshed = await getFilesAndFolders({userId: user.id});
+			const refreshed = await getFilesAndFolders({ userId: user.id });
 			setRootFolders(refreshed);
 		} catch (error) {
 			console.error("Failed to create folder:", error);
@@ -75,32 +76,35 @@ export function AppSidebar({
 		}
 	};
 
-	useEffect(() => {
-		if (!isLoaded || !user?.id) return;
+	const fetchRootFolders = useCallback(async () => {
+		if (!user?.id) return;
 
 		setGettingFolders(true);
+		try {
+			const userId = user.id;
+			const folders = await getFilesAndFolders({ userId });
+			setRootFolders(folders);
+			toast("Fetch successful", {
+				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)]
+			});
+		} catch (error) {
+			console.error("Error fetching root folders:", error);
+			toast("There was an error getting your folders", {
+				description: db_offline_placeholders[Math.floor(Math.random() * db_offline_placeholders.length)],
+				action: {
+					label: "Try Again",
+					onClick: fetchRootFolders,
+				},
+			});
+		} finally {
+			setGettingFolders(false);
+		}
+	}, [user?.id]);
 
-		const fetchRootFolders = async () => {
-			try {
-				const userId = user.id;
-				const folders = await getFilesAndFolders({userId});
-				setRootFolders(folders);
-			} catch (error) {
-				console.error("Error fetching root folders:", error);
-				toast("There was an error getting your folders", {
-					description: "The database might be offline",
-					action: {
-						label: "Try Again",
-						onClick: () => console.log("Try again")
-					}
-				})
-			} finally {
-				setGettingFolders(false);
-			}
-		};
-
+	useEffect(() => {
+		if (!isLoaded || !user?.id) return;
 		fetchRootFolders();
-	}, [isLoaded, user?.id]);
+	}, [isLoaded, user?.id, fetchRootFolders]);
 
 	return (
 		<Sidebar className="mt-16" collapsible="icon">
