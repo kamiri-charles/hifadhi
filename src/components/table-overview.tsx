@@ -16,33 +16,34 @@ import {
 import { Button } from "./ui/button";
 import { db_offline_placeholders, empty_folder_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
 import type { File } from "@/db/schema";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { getFilesAndFolders } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
+import { format } from "date-fns";
 
 
 interface TableOverviewProps {
-	selectedRootFolder: File | null;
+	currentFolder: File | null;
+	setCurrentFolder: Dispatch<SetStateAction<File | null>>,
+	refreshKey: number;
 }
 
-export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
+export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: TableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const {user, isLoaded} = useUser();
-	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders, [selectedRootFolder?.id]);
+	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders, [currentFolder?.id]);
 
 
 	const fetchChildren = useCallback(async () => {
-		console.log("Fetching children")
 		if (!user?.id) return;
 		setLoading(true);
 
 		try {
 			const userId = user.id;
-			console.log(selectedRootFolder?.id);
-			const children = await getFilesAndFolders({ userId, parentFolderId: selectedRootFolder?.id }); // Bug - Sometimes fetches the root folders
+			const children = await getFilesAndFolders({ userId, parentFolderId: currentFolder?.id });
 			setFilesAndFolders(children);
 			toast("Fetch successful", {
 				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)],
@@ -61,16 +62,16 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 		} finally {
 			setLoading(false);
 		}
-	}, [user?.id, selectedRootFolder?.id]);
+	}, [user?.id, currentFolder?.id]);
 
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 
-		if (selectedRootFolder) fetchChildren();
+		if (currentFolder) fetchChildren();
 
-	}, [isLoaded, user?.id, selectedRootFolder, fetchChildren]);
+	}, [isLoaded, user?.id, currentFolder, fetchChildren, refreshKey]);
 
-	if (!selectedRootFolder) {
+	if (!currentFolder) {
 		return (
 			<div className="font-medium mt-40 text-center">
 				Fold me once, shame on you. Fold me twice—well, just pick a folder
@@ -80,7 +81,7 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 	}
 
 	// Loading
-	if (selectedRootFolder && loading) {
+	if (currentFolder && loading) {
 		return (
 			<div className="flex flex-col items-center mt-40 text-center gap-2 font-medium">
 				<Loader2 size={30} className="animate-spin" />
@@ -90,14 +91,14 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 	}
 
 	// Empty folder
-	if (selectedRootFolder && !loading && filesAndFolders.length === 0) {
+	if (currentFolder && !loading && filesAndFolders.length === 0) {
 		return (
 			<div className="font-medium mt-40 text-center">{emptyFolderPlaceholder}</div>
 		);
 	}
 
 	// Content
-	if (selectedRootFolder && !loading && filesAndFolders.length > 0) {
+	if (currentFolder && !loading && filesAndFolders.length > 0) {
 		return (
 			<Table>
 				<TableHeader>
@@ -111,13 +112,17 @@ export function TableOverview({ selectedRootFolder }: TableOverviewProps) {
 				</TableHeader>
 				<TableBody>
 					{filesAndFolders.map((data) => (
-						<TableRow key={data.name}>
+						<TableRow key={data.name} className="cursor-pointer" onClick={() => {
+							if (data.isFolder) setCurrentFolder(data);
+						}}>
 							<TableCell className="flex items-center gap-2">
 								<Folder />
 								{data.name}
 							</TableCell>
 							<TableCell>{data.type}</TableCell>
-							<TableCell>{data.createdAt.toISOString()}</TableCell>
+							<TableCell>
+								{format(new Date(data.createdAt), "MMM d, yyyy")}
+							</TableCell>
 							<TableCell>{data.size}</TableCell>
 							<TableCell className="text-right">
 								<Button

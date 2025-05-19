@@ -35,6 +35,21 @@ export async function getFilesAndFolders({
 	return folders;
 }
 
+export async function getFolderById(folderId: string, userId: string) {
+	const [folder] = await db
+		.select()
+		.from(files)
+		.where(
+			and(
+				eq(files.id, folderId),
+				eq(files.userId, userId),
+				eq(files.isFolder, true)
+			)
+		);
+
+	return folder ?? null;
+}
+
 export async function createFolder({
 	name,
 	userId,

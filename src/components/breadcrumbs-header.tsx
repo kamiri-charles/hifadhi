@@ -7,27 +7,30 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type { File } from "@/db/schema";
+import type { Dispatch, SetStateAction } from "react";
 
 interface BreadcrumbsHeaderProps {
-  selectedRootFolder: File | null,
+  folderTrail: File[];
+  setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 }
 
-export function BreadcrumbsHeader({selectedRootFolder}: BreadcrumbsHeaderProps) {
+export function BreadcrumbsHeader({folderTrail, setCurrentFolder}: BreadcrumbsHeaderProps) {
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <span>{selectedRootFolder? selectedRootFolder.name: "/"}</span>
-        </BreadcrumbItem>
-        {/* <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-        </BreadcrumbItem> */}
-      </BreadcrumbList>
-    </Breadcrumb>
-  )
+		<Breadcrumb>
+			<BreadcrumbList>
+				{folderTrail.map((folder, index) => (
+					<BreadcrumbItem key={folder.id}>
+						{index < folderTrail.length - 1 ? (
+							<>
+								<BreadcrumbLink onClick={() => setCurrentFolder(folder)} href="#">{folder.name}</BreadcrumbLink>
+								<BreadcrumbSeparator />
+							</>
+						) : (
+							<BreadcrumbPage>{folder.name}</BreadcrumbPage>
+						)}
+					</BreadcrumbItem>
+				))}
+			</BreadcrumbList>
+		</Breadcrumb>
+	);
 }

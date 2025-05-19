@@ -32,12 +32,14 @@ interface AppSidebarProps {
 	identifier: string;
 	selectedRootFolder: File | null;
 	setSelectedRootFolder: Dispatch<SetStateAction<File | null>>;
+	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 }
 
 export function AppSidebar({
 	identifier,
 	selectedRootFolder,
 	setSelectedRootFolder,
+	setCurrentFolder,
 }: AppSidebarProps) {
 	const { state } = useSidebar();
 	const { user, isLoaded } = useUser();
@@ -177,7 +179,10 @@ export function AppSidebar({
 										<SidebarMenuItem
 											className="cursor-pointer"
 											key={folder.name}
-											onClick={() => setSelectedRootFolder(folder)}
+											onClick={() => {
+												setSelectedRootFolder(folder);
+												setCurrentFolder(folder);
+											}}
 										>
 											<SidebarMenuButton
 												asChild
