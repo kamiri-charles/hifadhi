@@ -14,7 +14,7 @@ interface GetFoldersProps {
 	folderParentId?: string | null;
 }
 
-export async function getFolders({
+export async function getFilesAndFolders({
 	userId,
 	folderParentId = null,
 }: GetFoldersProps) {

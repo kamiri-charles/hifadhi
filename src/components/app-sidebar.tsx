@@ -22,7 +22,7 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import type { File } from "@/db/schema";
-import { createFolder, getFolders } from "@/api/folders";
+import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 
 interface AppSidebarProps {
@@ -36,7 +36,7 @@ export function AppSidebar({
 	selectedParentFolder,
 	setSelectedParentFolder,
 }: AppSidebarProps) {
-	const [gettingFolders, setGettingFolders] = useState(true); // Getting folders loader
+	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
 	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] = useState(false);
 	const [newFolderName, setNewFolderName] = useState("");
@@ -52,17 +52,13 @@ export function AppSidebar({
 			await createFolder({
 				userId: user.id,
 				name: newFolderName.trim(),
-				parentId: null, // root folder
 			});
 
 			setNewFolderName("");
 			setCreatingFolder(false);
 
 			// Re-fetch folders
-			const refreshed = await getFolders({
-				userId: user.id,
-				folderParentId: null,
-			});
+			const refreshed = await getFilesAndFolders({userId: user.id});
 			setRootFolders(refreshed);
 		} catch (error) {
 			console.error("Failed to create folder:", error);
@@ -72,9 +68,6 @@ export function AppSidebar({
 		}
 	};
 
-
-	
-	
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 
@@ -83,7 +76,7 @@ export function AppSidebar({
 		const fetchRootFolders = async () => {
 			try {
 				const userId = user.id;
-				const folders = await getFolders({ userId, folderParentId: null });
+				const folders = await getFilesAndFolders({userId});
 				setRootFolders(folders);
 			} catch (error) {
 				console.error("Error fetching root folders:", error);
@@ -113,7 +106,9 @@ export function AppSidebar({
 					{gettingFolders ? (
 						<div className="flex flex-col items-center mt-20 justify-center text-center">
 							<Loader2 size={40} className="animate-spin" />
-							<span className="text-3xs">Hold tight, your folders are being... re-foldered</span>
+							<span className="text-3xs">
+								Hold tight, your folders are being... re-foldered
+							</span>
 						</div>
 					) : (
 						<SidebarGroupContent>
