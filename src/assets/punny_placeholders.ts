@@ -131,3 +131,41 @@ export const loading_placeholders = [
 	"Locating the meaning of life... and your files.",
 ];
 
+export const upload_success_placeholders = [
+	"Uploaded faster than you can say 'byte me'",
+	"File successfully beamed into the cloud",
+	"Upload complete — zero packets were harmed",
+	"Your file is now living its best digital life",
+	"Like a boss — upload finished",
+	"Cloud: 1, Gravity: 0",
+	"The file flew up and stuck the landing",
+	"Mission accomplished — file touched the sky",
+	"Your upload just leveled up",
+	"That file is now 100% more cloud-enabled",
+	"Upload complete. Time to celebrate with a coffee",
+	"Your file passed the vibe check",
+	"Upload was smoother than a fresh jar of Skippy",
+	"All systems green. Upload successful",
+	"Your file just earned its wings",
+	"Uploaded — it's not rocket science, but that was still cool",
+];
+
+export const upload_failure_placeholders = [
+	"Upload failed — file took a wrong turn at Albuquerque",
+	"The cloud sneezed. Try again",
+	"Oops... your file ghosted us mid-upload",
+	"Upload tripped over a 404",
+	"File said 'nope' halfway through",
+	"Upload failed. Even the bytes are confused",
+	"The file tried to escape. We almost had it",
+	"We lost the file in the cloud somewhere",
+	"Well... that didn't go according to plan",
+	"The upload fell into a digital black hole",
+	"RIP to that file. It never stood a chance",
+	"Upload failed — we blame gremlins",
+	"The server just rage quit mid-upload",
+	"File got stage fright and refused to go up",
+	"The cloud coughed. File didn't make it",
+	"Upload crashed harder than my Monday motivation",
+];
+

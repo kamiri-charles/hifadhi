@@ -85,7 +85,10 @@ const Dashboard = () => {
 			/>
 
 			<div className="flex-1 h-full p-4">
-				<BreadcrumbsHeader folderTrail={breadcrumbTrail} setCurrentFolder={setCurrentFolder} />
+				<BreadcrumbsHeader
+					folderTrail={breadcrumbTrail}
+					setCurrentFolder={setCurrentFolder}
+				/>
 
 				{selectedRootFolder ? (
 					<div className="flex justify-end gap-2">
@@ -125,14 +128,16 @@ const Dashboard = () => {
 							</PopoverContent>
 						</Popover>
 
-						<Input placeholder="Search" className="w-xs" />
-						<Button
-							className="cursor-pointer rounded-full"
-							variant="ghost"
-							size="icon"
-						>
-							<Search />
-						</Button>
+						<div className="relative w-[250px]">
+							<Input
+								placeholder="Search"
+								className="pr-10" // space for the icon on the right
+							/>
+							<Search
+								className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+								size={18}
+							/>
+						</div>
 					</div>
 				) : null}
 

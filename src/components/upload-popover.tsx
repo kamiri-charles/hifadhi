@@ -10,6 +10,7 @@ import { useDropzone } from "react-dropzone";
 import { uploadFile } from "@/api/upload";
 import { toast } from "sonner";
 import { Scan } from "lucide-react";
+import { upload_failure_placeholders, upload_success_placeholders } from "@/assets/punny_placeholders";
 
 interface UploadPopoverProps {
 	userId: string;
@@ -45,13 +46,17 @@ export function UploadPopover({ userId, parentId }: UploadPopoverProps) {
 			});
 
 			if (result) {
-				toast.success(`${file.name} uploaded successfully`);
+				toast(`${file.name} uploaded successfully`, {
+					description: upload_success_placeholders[Math.floor(Math.random() * upload_success_placeholders.length)]
+				});
 				updateProgress(index, { progress: 100, status: "success" });
 			} else {
 				throw new Error("Upload failed");
 			}
 		} catch (err) {
-			toast.error(`Failed to upload ${file.name}`);
+			toast(`Failed to upload ${file.name}`, {
+				description: upload_failure_placeholders[Math.floor(Math.random()) * upload_failure_placeholders.length]
+			});
 			updateProgress(index, { status: "error" });
 		}
 	};

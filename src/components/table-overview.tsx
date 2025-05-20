@@ -6,36 +6,51 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import {
-	Download,
-	EllipsisVertical,
-	Folder,
-	Loader2,
-	Trash,
-} from "lucide-react";
+import { Download, EllipsisVertical, FolderX, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { db_offline_placeholders, empty_folder_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
+import {
+	db_offline_placeholders,
+	empty_folder_placeholders,
+	fetch_success_placeholders,
+	loading_placeholders,
+} from "@/assets/punny_placeholders";
 import type { File } from "@/db/schema";
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import {
+	useCallback,
+	useEffect,
+	useState,
+	type Dispatch,
+	type SetStateAction,
+} from "react";
 import { useUser } from "@clerk/clerk-react";
 import { getFilesAndFolders } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
-
+import {
+	formatFileSize,
+	getFileExtension,
+	getFileIcon,
+} from "@/assets/helper_fns";
 
 interface TableOverviewProps {
 	currentFolder: File | null;
-	setCurrentFolder: Dispatch<SetStateAction<File | null>>,
+	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 	refreshKey: number;
 }
 
-export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: TableOverviewProps) {
+export function TableOverview({
+	currentFolder,
+	setCurrentFolder,
+	refreshKey,
+}: TableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
-	const {user, isLoaded} = useUser();
-	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders, [currentFolder?.id]);
-
+	const { user, isLoaded } = useUser();
+	const emptyFolderPlaceholder = useRandomPlaceholder(
+		empty_folder_placeholders,
+		[currentFolder?.id]
+	);
 
 	const fetchChildren = useCallback(async () => {
 		if (!user?.id) return;
@@ -43,17 +58,32 @@ export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: T
 
 		try {
 			const userId = user.id;
-			const children = await getFilesAndFolders({ userId, parentFolderId: currentFolder?.id });
-			setFilesAndFolders(children);
-			toast("Fetch successful", {
-				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)],
+			const children = await getFilesAndFolders({
+				userId,
+				parentFolderId: currentFolder?.id,
 			});
 
+			// Sorting
+			const sorted = children.sort((a, b) => {
+				if (a.type === "folder" && b.type !== "folder") return -1;
+				if (a.type !== "folder" && b.type === "folder") return 1;
+				return a.name.localeCompare(b.name);
+			});
+
+			setFilesAndFolders(sorted);
+			toast("Fetch successful", {
+				description:
+					fetch_success_placeholders[
+						Math.floor(Math.random() * fetch_success_placeholders.length)
+					],
+			});
 		} catch (error) {
 			console.error("Error getting files:", error);
 			toast("There was an error getting your files", {
 				description:
-					db_offline_placeholders[Math.floor(Math.random() * db_offline_placeholders.length)],
+					db_offline_placeholders[
+						Math.floor(Math.random() * db_offline_placeholders.length)
+					],
 				action: {
 					label: "Try Again",
 					onClick: fetchChildren,
@@ -68,7 +98,6 @@ export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: T
 		if (!isLoaded || !user?.id) return;
 
 		if (currentFolder) fetchChildren();
-
 	}, [isLoaded, user?.id, currentFolder, fetchChildren, refreshKey]);
 
 	if (!currentFolder) {
@@ -85,15 +114,24 @@ export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: T
 		return (
 			<div className="flex flex-col items-center mt-40 text-center gap-2 font-medium">
 				<Loader2 size={30} className="animate-spin" />
-				<span>{loading_placeholders[Math.floor(Math.random() * loading_placeholders.length)]}</span>
+				<span>
+					{
+						loading_placeholders[
+							Math.floor(Math.random() * loading_placeholders.length)
+						]
+					}
+				</span>
 			</div>
-		)
+		);
 	}
 
 	// Empty folder
 	if (currentFolder && !loading && filesAndFolders.length === 0) {
 		return (
-			<div className="font-medium mt-40 text-center">{emptyFolderPlaceholder}</div>
+			<div className="flex flex-col items-center gap-2 font-medium mt-40 text-center">
+				<FolderX size={50} />
+				{emptyFolderPlaceholder}
+			</div>
 		);
 	}
 
@@ -105,40 +143,50 @@ export function TableOverview({ currentFolder, setCurrentFolder, refreshKey }: T
 					<TableRow>
 						<TableHead className="w-[200px]">Name</TableHead>
 						<TableHead className="w-[100px]">Type</TableHead>
-						<TableHead className="w-[100px]">Created</TableHead>
-						<TableHead>Size</TableHead>
+						<TableHead className="w-[120px]">Created</TableHead>
+						<TableHead className="w-[40px]">Size</TableHead>
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					{filesAndFolders.map((data) => (
-						<TableRow key={data.name} className="cursor-pointer" onClick={() => {
-							if (data.isFolder) setCurrentFolder(data);
-						}}>
-							<TableCell className="flex items-center gap-2">
-								<Folder />
-								{data.name}
+						<TableRow key={data.name}>
+							<TableCell
+								className="cursor-pointer"
+								onClick={() => {
+									if (data.isFolder) setCurrentFolder(data);
+								}}
+							>
+								<div className="flex items-center gap-2">
+									{(() => {
+										const Icon = getFileIcon(
+											data.name.split(".").pop() || "",
+											data.type === "folder"
+										);
+										return <Icon className="w-4 h-4" />;
+									})()}
+									{data.name}
+								</div>
 							</TableCell>
-							<TableCell>{data.type}</TableCell>
+							<TableCell>
+								{getFileExtension(data.type)}
+							</TableCell>
 							<TableCell>
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
-							<TableCell>{data.size}</TableCell>
+							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
 							<TableCell className="text-right">
-								<Button
-									className="rounded-full cursor-pointer"
-									variant="ghost"
-									size="icon"
-								>
-									<Download />
-								</Button>
-								<Button
-									className="rounded-full cursor-pointer"
-									variant="ghost"
-									size="icon"
-								>
-									<Trash />
-								</Button>
+								{data.type == "folder" ? null : (
+									<Button
+										className="rounded-full cursor-pointer"
+										variant="ghost"
+										size="icon"
+									>
+										<Download />
+									</Button>
+								)}
+
+								
 								<Button
 									className="rounded-full cursor-pointer"
 									variant="ghost"
