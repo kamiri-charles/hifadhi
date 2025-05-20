@@ -14,6 +14,7 @@ import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { getBreadcrumbTrail } from "@/assets/helper_fns";
 import { createFolder } from "@/api/folders";
+import { UploadPopover } from "@/components/upload-popover";
 
 const Dashboard = () => {
 	const nav = useNavigate();
@@ -88,12 +89,7 @@ const Dashboard = () => {
 
 				{selectedRootFolder ? (
 					<div className="flex justify-end gap-2">
-						<Button
-							className="bg-indigo-800 text-white py-2 cursor-pointer hover:bg-blue-600"
-							onClick={() => toast("This feature is under development.")} // TODO - Work on this functionality
-						>
-							Upload
-						</Button>
+						<UploadPopover userId={user!.id} parentId={currentFolder!.id} />
 
 						<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 							<PopoverTrigger>
