@@ -6,8 +6,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Download, EllipsisVertical, FolderX, Loader2 } from "lucide-react";
-import { Button } from "./ui/button";
+import { FolderX, Loader2 } from "lucide-react";
 import {
 	db_offline_placeholders,
 	empty_folder_placeholders,
@@ -32,6 +31,7 @@ import {
 	getFileExtension,
 	getFileIcon,
 } from "@/assets/helper_fns";
+import { FolderActionsDropdown } from "./folder-actions-dropdown";
 
 interface TableOverviewProps {
 	currentFolder: File | null;
@@ -175,25 +175,8 @@ export function TableOverview({
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
 							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
-							<TableCell className="text-right">
-								{data.type == "folder" ? null : (
-									<Button
-										className="rounded-full cursor-pointer"
-										variant="ghost"
-										size="icon"
-									>
-										<Download />
-									</Button>
-								)}
-
-								
-								<Button
-									className="rounded-full cursor-pointer"
-									variant="ghost"
-									size="icon"
-								>
-									<EllipsisVertical />
-								</Button>
+							<TableCell className="relative text-right">
+									<FolderActionsDropdown label={data.name} />
 							</TableCell>
 						</TableRow>
 					))}

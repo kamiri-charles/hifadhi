@@ -1,25 +1,19 @@
 import { useState, type Dispatch, type SetStateAction, useEffect, useCallback } from "react";
-import { Check, Folder, Loader2, MoreHorizontal, Plus, X } from "lucide-react";
+import { Check, Folder, Loader2, Plus, Trash, X } from "lucide-react";
 
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupAction,
 	SidebarGroupContent,
 	SidebarGroupLabel,
 	SidebarMenu,
-	SidebarMenuAction,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import {
-	DropdownMenu,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuItem,
-} from "@radix-ui/react-dropdown-menu";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import type { File } from "@/db/schema";
@@ -27,6 +21,7 @@ import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { db_offline_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
+import { FolderActionsDropdown } from "./folder-actions-dropdown";
 
 interface AppSidebarProps {
 	identifier: string;
@@ -111,7 +106,7 @@ export function AppSidebar({
 	}, [isLoaded, user?.id, fetchRootFolders]);
 
 	return (
-		<Sidebar className="mt-16" collapsible="icon">
+		<Sidebar className="mt-16 h-[calc(100%-4rem)]" collapsible="icon">
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>{identifier}</SidebarGroupLabel>
@@ -129,7 +124,11 @@ export function AppSidebar({
 						<div className="flex flex-col items-center mt-40 justify-center text-center gap-2">
 							<Loader2 size={30} className="animate-spin" />
 							<span className="font-medium">
-								{loading_placeholders[Math.floor(Math.random() * loading_placeholders.length)]}
+								{
+									loading_placeholders[
+										Math.floor(Math.random() * loading_placeholders.length)
+									]
+								}
 							</span>
 						</div>
 					) : (
@@ -194,21 +193,7 @@ export function AppSidebar({
 												</div>
 											</SidebarMenuButton>
 
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<SidebarMenuAction className="cursor-pointer">
-														<MoreHorizontal />
-													</SidebarMenuAction>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent side="right" align="start">
-													<DropdownMenuItem>
-														<span>Rename</span>
-													</DropdownMenuItem>
-													<DropdownMenuItem>
-														<span>Delete</span>
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
+											<FolderActionsDropdown label={folder.name} />
 										</SidebarMenuItem>
 									))}
 								</SidebarMenu>
@@ -231,6 +216,12 @@ export function AppSidebar({
 					)}
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter>
+				<div className="flex gap-2 cursor-pointer items-center px-3 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-colors">
+					<Trash />
+					<span>Bin</span>
+				</div>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
