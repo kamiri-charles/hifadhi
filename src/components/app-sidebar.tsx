@@ -193,7 +193,7 @@ export function AppSidebar({
 												</div>
 											</SidebarMenuButton>
 
-											<FolderActionsDropdown label={folder.name} />
+											<FolderActionsDropdown label={folder.name} fileId={folder.id} currentName={folder.name} />
 										</SidebarMenuItem>
 									))}
 								</SidebarMenu>

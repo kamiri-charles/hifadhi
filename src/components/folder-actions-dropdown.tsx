@@ -8,14 +8,16 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuAction } from "./ui/sidebar";
-import { ArrowDownToLine, EllipsisVertical, Pen, Trash } from "lucide-react";
+import { ArrowDownToLine, EllipsisVertical, Trash } from "lucide-react";
+import { RenamePopover } from "./rename-popover";
 
 interface FolderActionsDropdownProps {
     label: string;
+	fileId: string;
+	currentName: string;
 }
 
-
-export function FolderActionsDropdown({label}: FolderActionsDropdownProps) {
+export function FolderActionsDropdown({label, fileId, currentName}: FolderActionsDropdownProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -26,12 +28,7 @@ export function FolderActionsDropdown({label}: FolderActionsDropdownProps) {
 			<DropdownMenuContent className="w-48">
 				<DropdownMenuLabel>{label}</DropdownMenuLabel>
 				<DropdownMenuGroup>
-					<DropdownMenuItem className="cursor-pointer">
-						Rename
-						<DropdownMenuShortcut>
-							<Pen />
-						</DropdownMenuShortcut>
-					</DropdownMenuItem>
+					<RenamePopover fileId={fileId} currentName={currentName} />
 					<DropdownMenuItem className="cursor-pointer">
 						Download
 						<DropdownMenuShortcut>

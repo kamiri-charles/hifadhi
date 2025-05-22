@@ -176,7 +176,7 @@ export function TableOverview({
 							</TableCell>
 							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
 							<TableCell className="relative text-right">
-									<FolderActionsDropdown label={data.name} />
+									<FolderActionsDropdown label={data.name} fileId={data.id} currentName={data.name} />
 							</TableCell>
 						</TableRow>
 					))}

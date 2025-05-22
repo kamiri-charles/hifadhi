@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { files } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { sql, and, eq, like } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
 interface CreateFileProps {
@@ -73,3 +73,63 @@ export async function createFile({
 
 	return newFolder;
 }
+
+interface RenameFileProps {
+	fileId: string;
+	userId: string;
+	newName: string;
+}
+
+interface RenameFileProps {
+	fileId: string;
+	userId: string;
+	newName: string;
+}
+
+export async function renameFile({ fileId, userId, newName }: RenameFileProps) {
+	if (!newName.trim()) {
+		throw new Error("New name is required");
+	}
+
+	// Get the original file/folder
+	const [file] = await db
+		.select()
+		.from(files)
+		.where(and(eq(files.id, fileId), eq(files.userId, userId)));
+
+	if (!file) {
+		throw new Error("File not found or access denied.");
+	}
+
+	const trimmedNewName = newName.trim();
+
+	// If it's a folder, update paths of all nested files/folders
+	if (file.isFolder) {
+		const oldFullPath = `${file.path}${file.name}/`;
+		const newFullPath = `${file.path}${trimmedNewName}/`;
+
+		// 1. Update all nested items' path
+		await db
+			.update(files)
+			.set({
+				path: sql`REPLACE(${files.path}, ${oldFullPath}, ${newFullPath})`,
+				updatedAt: new Date(),
+			})
+			.where(
+				and(like(files.path, `${oldFullPath}%`), eq(files.userId, userId))
+			);
+	}
+
+	// 2. Rename the file or folder itself
+	const [updated] = await db
+		.update(files)
+		.set({
+			name: trimmedNewName,
+			updatedAt: new Date(),
+		})
+		.where(and(eq(files.id, fileId), eq(files.userId, userId)))
+		.returning();
+
+	return updated;
+}
+
