@@ -4,20 +4,22 @@ import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Cloud, Folder, Layers, Shield, Zap } from "lucide-react";
 import Navbar from "@/components/navbar";
+import { toast } from "sonner";
 
 const Landing = () => {
 	const nav = useNavigate();
 	const { isSignedIn, isLoaded } = useAuth();
 	useEffect(() => {
+		toast("Hold on", { description: "Checking authentication status" });
 		if (isSignedIn && isLoaded) nav("/dashboard");
 	}, [isSignedIn, isLoaded]);
 	return (
-		<div className="w-full h-full flex items-center justify-around px-10 relative isolate overflow-hidden bg-white/5 py-24 sm:py-32">
+		<div className="w-full h-full flex flex-wrap items-center justify-around px-10 overflow-auto relative isolate bg-white/5 py-24 sm:py-32">
 			<Navbar />
 
-			<div className="flex flex-col gap-1 w-7xl px-10">
+			<div className="h-full flex flex-col flex-wrap gap-1 mt-40 lg:mt-30">
 				<h2 className="text-5xl">Store your files with ease</h2>
-				<span>Simple. Secure. Fase</span>
+				<span>Simple. Secure. Fast</span>
 
 				<div className="flex gap-4 mt-8">
 					<Button
@@ -35,9 +37,10 @@ const Landing = () => {
 				</div>
 			</div>
 
-			<div className="flex flex-col gap-4 w-7xl">
-				<h2 className="text-4xl">What you get</h2>
-				<div className="flex flex-wrap gap-3">
+			<div className="flex flex-col gap-4">
+				<h2 className="text-4xl">Features</h2>
+
+				<div className="flex flex-wrap items-center gap-4">
 					<div className="flex flex-col gap-2 p-4 bg-accent rounded-lg cursor-pointer">
 						<div className="flex items-center justify-center gap-2">
 							<Shield size={30} color="oklch(62.3% 0.214 259.815)" />
@@ -45,7 +48,7 @@ const Landing = () => {
 								Secure Cloud Storage
 							</span>
 						</div>
-						<span className="w-3xs mx-auto">
+						<span>
 							Fort Knox called—they want their security back.
 						</span>
 					</div>
@@ -55,7 +58,7 @@ const Landing = () => {
 							<Cloud size={30} color="oklch(62.3% 0.214 259.815)" />
 							<span className="text-2xl text-blue-500">Anywhere Access</span>
 						</div>
-						<span className="w-3xs mx-auto">
+						<span>
 							Your files get more stamps in their passport than you do.
 						</span>
 					</div>
@@ -67,7 +70,7 @@ const Landing = () => {
 								Organized File Management
 							</span>
 						</div>
-						<span className="w-3xs mx-auto">
+						<span>
 							Marie Kondo would swipe right on your folders.
 						</span>
 					</div>
@@ -79,7 +82,7 @@ const Landing = () => {
 								Blazing Fast Uploads
 							</span>
 						</div>
-						<span className="w-3xs mx-auto">
+						<span>
 							Blink and you'll miss it—seriously, don't blink.
 						</span>
 					</div>
@@ -89,7 +92,7 @@ const Landing = () => {
 							<Layers size={30} color="oklch(62.3% 0.214 259.815)" />
 							<span className="text-2xl text-blue-500">Intuitive UI</span>
 						</div>
-						<span className="w-3xs mx-auto">
+						<span>
 							So simple your cat could navigate it (no promises on the typing).
 						</span>
 					</div>

@@ -5,5 +5,5 @@ import { Button } from "./ui/button";
 export function CustomSidebarTrigger() {
 	const { toggleSidebar } = useSidebar();
 
-	return <Button className="absolute left-5 rounded-full cursor-pointer" variant="outline" size="icon" onClick={toggleSidebar}><PanelRight size={20} /></Button>;
+	return <Button className="rounded-full cursor-pointer" variant="outline" size="icon" onClick={toggleSidebar}><PanelRight size={20} /></Button>;
 }

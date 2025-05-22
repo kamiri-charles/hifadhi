@@ -21,7 +21,7 @@ export function ModeToggle() {
 	const isDark = theme === "dark";
 
 	return (
-		<Button className="rounded-full cursor-pointer absolute right-5 z-10" variant="outline" size="icon" onClick={toggleTheme}>
+		<Button className="rounded-full cursor-pointer" variant="outline" size="icon" onClick={toggleTheme}>
 			{isDark ? (
 				<Sun className="h-[1.2rem] w-[1.2rem]" />
 			) : (
