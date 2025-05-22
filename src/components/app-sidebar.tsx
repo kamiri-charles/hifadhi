@@ -1,4 +1,10 @@
-import { useState, type Dispatch, type SetStateAction, useEffect, useCallback } from "react";
+import {
+	useState,
+	type Dispatch,
+	type SetStateAction,
+	useEffect,
+	useCallback,
+} from "react";
 import { Check, Folder, Loader2, Plus, Trash, X } from "lucide-react";
 
 import {
@@ -20,7 +26,11 @@ import type { File } from "@/db/schema";
 import { createFolder, getFilesAndFolders } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
-import { db_offline_placeholders, fetch_success_placeholders, loading_placeholders } from "@/assets/punny_placeholders";
+import {
+	db_offline_placeholders,
+	fetch_success_placeholders,
+	loading_placeholders,
+} from "@/assets/punny_placeholders";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 
 interface AppSidebarProps {
@@ -40,9 +50,11 @@ export function AppSidebar({
 	const { user, isLoaded } = useUser();
 	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
-	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] = useState(false);
+	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] =
+		useState(false);
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
+	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
 
 	const handleCreateFolder = async () => {
 		if (!user?.id || !newFolderName.trim()) return;
@@ -84,12 +96,18 @@ export function AppSidebar({
 			const folders = await getFilesAndFolders({ userId });
 			setRootFolders(folders);
 			toast("Fetch successful", {
-				description: fetch_success_placeholders[Math.floor(Math.random() * fetch_success_placeholders.length)]
+				description:
+					fetch_success_placeholders[
+						Math.floor(Math.random() * fetch_success_placeholders.length)
+					],
 			});
 		} catch (error) {
 			console.error("Error fetching root folders:", error);
 			toast("There was an error getting your folders", {
-				description: db_offline_placeholders[Math.floor(Math.random() * db_offline_placeholders.length)],
+				description:
+					db_offline_placeholders[
+						Math.floor(Math.random() * db_offline_placeholders.length)
+					],
 				action: {
 					label: "Try Again",
 					onClick: fetchRootFolders,
@@ -103,7 +121,7 @@ export function AppSidebar({
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 		fetchRootFolders();
-	}, [isLoaded, user?.id, fetchRootFolders]);
+	}, [isLoaded, user?.id, fetchRootFolders, sidebarRefreshKey]);
 
 	return (
 		<Sidebar className="mt-16 h-[calc(100%-4rem)]" collapsible="icon">
@@ -193,7 +211,12 @@ export function AppSidebar({
 												</div>
 											</SidebarMenuButton>
 
-											<FolderActionsDropdown label={folder.name} fileId={folder.id} currentName={folder.name} />
+											<FolderActionsDropdown
+												label={folder.name}
+												fileId={folder.id}
+												currentName={folder.name}
+												setSidebarRefreshKey={setSidebarRefreshKey}
+											/>
 										</SidebarMenuItem>
 									))}
 								</SidebarMenu>

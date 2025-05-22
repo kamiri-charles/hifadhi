@@ -10,14 +10,17 @@ import {
 import { SidebarMenuAction } from "./ui/sidebar";
 import { ArrowDownToLine, EllipsisVertical, Trash } from "lucide-react";
 import { RenamePopover } from "./rename-popover";
+import type { Dispatch, SetStateAction } from "react";
 
 interface FolderActionsDropdownProps {
     label: string;
 	fileId: string;
 	currentName: string;
+	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
+	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
 }
 
-export function FolderActionsDropdown({label, fileId, currentName}: FolderActionsDropdownProps) {
+export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey}: FolderActionsDropdownProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -28,7 +31,7 @@ export function FolderActionsDropdown({label, fileId, currentName}: FolderAction
 			<DropdownMenuContent className="w-48">
 				<DropdownMenuLabel>{label}</DropdownMenuLabel>
 				<DropdownMenuGroup>
-					<RenamePopover fileId={fileId} currentName={currentName} />
+					<RenamePopover fileId={fileId} currentName={currentName} setSidebarRefreshKey={setSidebarRefreshKey} setContentRefreshKey={setContentRefreshKey} />
 					<DropdownMenuItem className="cursor-pointer">
 						Download
 						<DropdownMenuShortcut>

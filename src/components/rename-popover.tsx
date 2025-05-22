@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
 import { renameFile } from "@/api/files";
 import { DropdownMenuShortcut } from "./ui/dropdown-menu";
@@ -15,13 +15,15 @@ import { useUser } from "@clerk/clerk-react";
 interface RenamePopoverProps {
 	fileId: string;
 	currentName: string;
-	onRename?: () => void;
+	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
+	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
 }
 
 export function RenamePopover({
 	fileId,
 	currentName,
-	onRename,
+	setSidebarRefreshKey,
+	setContentRefreshKey,
 }: RenamePopoverProps) {
 	const { user, isLoaded } = useUser();
 	const [open, setOpen] = useState(false);
@@ -44,7 +46,8 @@ export function RenamePopover({
 			await renameFile({ fileId, userId: user.id, newName });
 			toast.success("Renamed successfully!");
 			setOpen(false);
-			onRename?.();
+			if (setSidebarRefreshKey) setSidebarRefreshKey(prev => prev + 1);
+			if (setContentRefreshKey) setContentRefreshKey(prev => prev + 1);
 		} catch (error: any) {
 			console.error(error);
 			toast.error(error.message || "Rename failed");

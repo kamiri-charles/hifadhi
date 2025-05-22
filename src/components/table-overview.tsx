@@ -51,6 +51,7 @@ export function TableOverview({
 		empty_folder_placeholders,
 		[currentFolder?.id]
 	);
+	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const fetchChildren = useCallback(async () => {
 		if (!user?.id) return;
@@ -98,7 +99,7 @@ export function TableOverview({
 		if (!isLoaded || !user?.id) return;
 
 		if (currentFolder) fetchChildren();
-	}, [isLoaded, user?.id, currentFolder, fetchChildren, refreshKey]);
+	}, [isLoaded, user?.id, currentFolder, fetchChildren, refreshKey, contentRefreshKey]);
 
 	if (!currentFolder) {
 		return (
@@ -176,7 +177,12 @@ export function TableOverview({
 							</TableCell>
 							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
 							<TableCell className="relative text-right">
-									<FolderActionsDropdown label={data.name} fileId={data.id} currentName={data.name} />
+									<FolderActionsDropdown
+										label={data.name}
+										fileId={data.id}
+										currentName={data.name}
+										setContentRefreshKey={setContentRefreshKey}
+									/>
 							</TableCell>
 						</TableRow>
 					))}
