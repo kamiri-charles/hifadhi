@@ -23,7 +23,7 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import type { File } from "@/db/schema";
-import { createFolder, getFilesAndFolders } from "@/api/folders";
+import { createFolder, getFolderContent } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import {
@@ -71,16 +71,13 @@ export function AppSidebar({
 			setCreatingFolder(false);
 
 			// Re-fetch folders
-			const refreshed = await getFilesAndFolders({ userId: user.id });
+			const refreshed = await getFolderContent({ userId: user.id });
 			setRootFolders(refreshed);
 		} catch (error) {
 			console.error("Failed to create folder:", error);
 			toast("There was an error creating the folder.", {
 				description: "Description",
-				action: {
-					label: "Okay",
-					onClick: () => console.log("Okay"),
-				},
+				// TODO: Add creating error here
 			});
 		} finally {
 			setFolderCreationLoaderVisible(false);
@@ -93,8 +90,11 @@ export function AppSidebar({
 		setGettingFolders(true);
 		try {
 			const userId = user.id;
-			const folders = await getFilesAndFolders({ userId });
-			setRootFolders(folders);
+			const folders = await getFolderContent({ userId });
+			const sorted = folders
+				.filter((folder) => !folder.isTrash)
+				.sort((a, b) => a.name.localeCompare(b.name));
+			setRootFolders(sorted);
 			toast("Fetch successful", {
 				description:
 					fetch_success_placeholders[
@@ -216,6 +216,7 @@ export function AppSidebar({
 												fileId={folder.id}
 												currentName={folder.name}
 												setSidebarRefreshKey={setSidebarRefreshKey}
+												setCurrentFolder={setCurrentFolder}
 											/>
 										</SidebarMenuItem>
 									))}

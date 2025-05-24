@@ -64,8 +64,11 @@ export function TableOverview({
 				parentFolderId: currentFolder?.id,
 			});
 
+			// Filter out trashed items
+			const nonTrashed = children.filter((item) => !item.isTrash);
+
 			// Sorting
-			const sorted = children.sort((a, b) => {
+			const sorted = nonTrashed.sort((a, b) => {
 				if (a.type === "folder" && b.type !== "folder") return -1;
 				if (a.type !== "folder" && b.type === "folder") return 1;
 				return a.name.localeCompare(b.name);

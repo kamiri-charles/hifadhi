@@ -8,9 +8,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuAction } from "./ui/sidebar";
-import { ArrowDownToLine, EllipsisVertical, Trash } from "lucide-react";
+import { ArrowDownToLine, EllipsisVertical, Loader2, Trash } from "lucide-react";
 import { RenamePopover } from "./rename-popover";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
+import { toast } from "sonner";
+import { toggleTrashed } from "@/api/general";
+import { useUser } from "@clerk/clerk-react";
+import type { File } from "@/db/schema";
 
 interface FolderActionsDropdownProps {
     label: string;
@@ -18,9 +22,31 @@ interface FolderActionsDropdownProps {
 	currentName: string;
 	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
 	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
+	setCurrentFolder?: Dispatch<SetStateAction<File | null>>;
 }
 
-export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey}: FolderActionsDropdownProps) {
+export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey, setCurrentFolder}: FolderActionsDropdownProps) {
+
+	const [isDeleting, setIsDeleting] = useState(false);
+	const { user } = useUser();
+
+	const handleDelete = async () => {
+		if (!user?.id) return toast.error("User not authenticated.");
+
+		setIsDeleting(true);
+		try {
+			await toggleTrashed({ userId: user.id, itemId: fileId });
+			toast.success("Moved to trash.");
+			if (setSidebarRefreshKey) setSidebarRefreshKey((k: number) => k + 1);
+			if (setContentRefreshKey) setContentRefreshKey((k: number) => k + 1);
+			if (setCurrentFolder) setCurrentFolder(null);
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to delete file.");
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -31,17 +57,27 @@ export function FolderActionsDropdown({label, fileId, currentName, setSidebarRef
 			<DropdownMenuContent className="w-48">
 				<DropdownMenuLabel>{label}</DropdownMenuLabel>
 				<DropdownMenuGroup>
-					<RenamePopover fileId={fileId} currentName={currentName} setSidebarRefreshKey={setSidebarRefreshKey} setContentRefreshKey={setContentRefreshKey} />
+					<RenamePopover
+						fileId={fileId}
+						currentName={currentName}
+						setSidebarRefreshKey={setSidebarRefreshKey}
+						setContentRefreshKey={setContentRefreshKey}
+					/>
 					<DropdownMenuItem className="cursor-pointer">
 						Download
 						<DropdownMenuShortcut>
 							<ArrowDownToLine />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
-					<DropdownMenuItem className="cursor-pointer">
-						Delete
+					<DropdownMenuItem
+						className="cursor-pointer"
+						onClick={handleDelete}
+						disabled={isDeleting}
+					>
+						<span>{isDeleting ? "Deleting..." : "Delete"}</span>
+
 						<DropdownMenuShortcut>
-							<Trash />
+							{isDeleting ? <Loader2 className="animate-spin" /> : <Trash />}
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
