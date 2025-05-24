@@ -9,32 +9,6 @@ interface CreateFolderProps {
 	parentId?: string | null;
 }
 
-interface GetFilesAndFoldersProps {
-	userId: string;
-	parentFolderId?: string | null;
-}
-
-
-export async function getFilesAndFolders({
-	userId,
-	parentFolderId = null,
-}: GetFilesAndFoldersProps) {
-	const folders = await db
-		.select()
-		.from(files)
-		.where(
-			and(
-				eq(files.userId, userId),
-				parentFolderId === null
-					? isNull(files.parentId)
-					: eq(files.parentId, parentFolderId)
-			)
-		)
-		.orderBy(files.name);
-
-	return folders;
-}
-
 export async function getFolderById(folderId: string, userId: string) {
 	const [folder] = await db
 		.select()
@@ -104,4 +78,30 @@ export async function createFolder({
 		.returning();
 
 	return newFolder;
+}
+
+
+interface GetFolderContentProps {
+	userId: string;
+	parentFolderId?: string | null;
+}
+
+export async function getFolderContent({
+	userId,
+	parentFolderId = null,
+}: GetFolderContentProps) {
+	const data = await db
+		.select()
+		.from(files)
+		.where(
+			and(
+				eq(files.userId, userId),
+				parentFolderId === null
+					? isNull(files.parentId)
+					: eq(files.parentId, parentFolderId)
+			)
+		)
+		.orderBy(files.name);
+
+	return data;
 }

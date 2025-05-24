@@ -22,7 +22,7 @@ import {
 	type SetStateAction,
 } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { getFilesAndFolders } from "@/api/folders";
+import { getFolderContent } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
@@ -59,7 +59,7 @@ export function TableOverview({
 
 		try {
 			const userId = user.id;
-			const children = await getFilesAndFolders({
+			const children = await getFolderContent({
 				userId,
 				parentFolderId: currentFolder?.id,
 			});

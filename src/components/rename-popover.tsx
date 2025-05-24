@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
-import { renameFile } from "@/api/files";
+import { renameItem } from "@/api/general";
 import { DropdownMenuShortcut } from "./ui/dropdown-menu";
 import { Loader2, Pen } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
@@ -43,7 +43,7 @@ export function RenamePopover({
 
 		setIsLoading(true);
 		try {
-			await renameFile({ fileId, userId: user.id, newName });
+			await renameItem({ fileId, userId: user.id, newName });
 			toast.success("Renamed successfully!");
 			setOpen(false);
 			if (setSidebarRefreshKey) setSidebarRefreshKey(prev => prev + 1);
