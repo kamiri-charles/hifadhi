@@ -29,9 +29,11 @@ import { toast } from "sonner";
 import {
 	db_offline_placeholders,
 	fetch_success_placeholders,
+	folder_creation_failure_placeholders,
 	loading_placeholders,
 } from "@/assets/punny_placeholders";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
+import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 
 interface AppSidebarProps {
 	identifier: string;
@@ -78,8 +80,7 @@ export function AppSidebar({
 		} catch (error) {
 			console.error("Failed to create folder:", error);
 			toast("There was an error creating the folder.", {
-				description: "Description",
-				// TODO: Add creating error here
+				description: useRandomPlaceholder(folder_creation_failure_placeholders)
 			});
 		} finally {
 			setFolderCreationLoaderVisible(false);

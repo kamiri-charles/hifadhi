@@ -169,3 +169,23 @@ export const upload_failure_placeholders = [
 	"Upload crashed harder than my Monday motivation",
 ];
 
+export const folder_creation_failure_placeholders = [
+	"Folder refused to be born. Identity crisis?",
+	"Tried to make a folder, but it folded under pressure",
+	"The folder creation flopped like a bad sequel",
+	"Oops... that folder flat-out ghosted us",
+	"We asked for a folder, but got crickets",
+	"The folder chickened out at the last second",
+	"Folder creation failed — we blame existential dread",
+	"The folder said 'nah' and peaced out",
+	"Tried to make a folder, but the cosmos said no",
+	"Folder went on a coffee break. Indefinitely",
+	"Even the bits weren't on board for this folder",
+	"Folder creation failed — it's shy, okay?",
+	"Something went sideways. The folder never showed up",
+	"The digital stork lost our folder delivery",
+	"Folder creation crashed harder than my Wi-Fi",
+	"That folder had one job… and it didn't do it",
+];
+
+
