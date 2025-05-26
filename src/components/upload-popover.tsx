@@ -13,8 +13,8 @@ import { Scan } from "lucide-react";
 import { upload_failure_placeholders, upload_success_placeholders } from "@/assets/punny_placeholders";
 
 interface UploadPopoverProps {
-	userId: string;
-	parentId: string;
+	userId: string | undefined;
+	parentId: string | undefined;
 }
 
 interface UploadItem {
@@ -24,7 +24,7 @@ interface UploadItem {
 	status: "idle" | "uploading" | "success" | "error";
 }
 
-export function UploadPopover({ userId, parentId }: UploadPopoverProps) {
+export function UploadPopover({ parentId, userId }: UploadPopoverProps) {
 	const [uploads, setUploads] = useState<UploadItem[]>([]);
 
 	const updateProgress = (index: number, value: Partial<UploadItem>) => {
@@ -38,27 +38,32 @@ export function UploadPopover({ userId, parentId }: UploadPopoverProps) {
 	const handleUpload = async (file: File, index: number) => {
 		updateProgress(index, { status: "uploading", progress: 10 });
 
-		try {
-			const result = await uploadFile({
-				file,
-				userId,
-				parentId,
-			});
-
-			if (result) {
-				toast(`${file.name} uploaded successfully`, {
-					description: upload_success_placeholders[Math.floor(Math.random() * upload_success_placeholders.length)]
+		if (userId && parentId) {
+			try {
+				const result = await uploadFile({
+					file,
+					userId,
+					parentId,
 				});
-				updateProgress(index, { progress: 100, status: "success" });
-			} else {
-				throw new Error("Upload failed");
+
+				if (result) {
+					toast(`${file.name} uploaded successfully`, {
+						description: upload_success_placeholders[Math.floor(Math.random() * upload_success_placeholders.length)]
+					});
+					updateProgress(index, { progress: 100, status: "success" });
+				} else {
+					throw new Error("Upload failed");
+				}
+			} catch (err) {
+				toast(`Failed to upload ${file.name}`, {
+					description: upload_failure_placeholders[Math.floor(Math.random()) * upload_failure_placeholders.length]
+				});
+				updateProgress(index, { status: "error" });
 			}
-		} catch (err) {
-			toast(`Failed to upload ${file.name}`, {
-				description: upload_failure_placeholders[Math.floor(Math.random()) * upload_failure_placeholders.length]
-			});
-			updateProgress(index, { status: "error" });
+		} else {
+			toast("An error occured during the upload process")
 		}
+		
 	};
 
 	const onDrop = useCallback(

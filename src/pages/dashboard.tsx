@@ -27,8 +27,6 @@ const Dashboard = () => {
 	const [refreshSubfolders, setRefreshSubfolders] = useState(0);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-
-
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
 
@@ -93,7 +91,7 @@ const Dashboard = () => {
 
 				{selectedRootFolder ? (
 					<div className="flex justify-end gap-2">
-						<UploadPopover userId={user!.id} parentId={currentFolder!.id} />
+						<UploadPopover userId={user?.id} parentId={currentFolder?.id} />
 
 						<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 							<PopoverTrigger>

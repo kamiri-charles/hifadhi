@@ -50,8 +50,7 @@ export function AppSidebar({
 	const { user, isLoaded } = useUser();
 	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
-	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] =
-		useState(false);
+	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] = useState(false);
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
@@ -72,7 +71,10 @@ export function AppSidebar({
 
 			// Re-fetch folders
 			const refreshed = await getFolderContent({ userId: user.id });
-			setRootFolders(refreshed);
+			const sorted = refreshed
+				.filter((folder) => !folder.isTrash)
+				.sort((a, b) => a.name.localeCompare(b.name));
+			setRootFolders(sorted);
 		} catch (error) {
 			console.error("Failed to create folder:", error);
 			toast("There was an error creating the folder.", {
