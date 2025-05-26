@@ -130,7 +130,7 @@ const Dashboard = () => {
 						<div className="relative w-[250px]">
 							<Input
 								placeholder="Search"
-								className="pr-10" // space for the icon on the right
+								className="pr-10"
 							/>
 							<Search
 								className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"

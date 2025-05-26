@@ -77,6 +77,7 @@ export function AppSidebar({
 				.filter((folder) => !folder.isTrash)
 				.sort((a, b) => a.name.localeCompare(b.name));
 			setRootFolders(sorted);
+			
 		} catch (error) {
 			console.error("Failed to create folder:", error);
 			toast("There was an error creating the folder.", {

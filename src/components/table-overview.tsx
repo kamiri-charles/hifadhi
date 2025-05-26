@@ -12,6 +12,7 @@ import {
 	empty_folder_placeholders,
 	fetch_success_placeholders,
 	loading_placeholders,
+	no_folder_selected_placeholders,
 } from "@/assets/punny_placeholders";
 import type { File } from "@/db/schema";
 import {
@@ -107,8 +108,7 @@ export function TableOverview({
 	if (!currentFolder) {
 		return (
 			<div className="font-medium mt-40 text-center">
-				Fold me once, shame on you. Fold me twice—well, just pick a folder
-				already!
+				{useRandomPlaceholder(no_folder_selected_placeholders)}
 			</div>
 		);
 	}

@@ -188,4 +188,21 @@ export const folder_creation_failure_placeholders = [
 	"That folder had one job… and it didn't do it",
 ];
 
-
+export const no_folder_selected_placeholders = [
+	"No folder selected — it's feeling a little left out",
+	"Pick a folder — any folder (preferably a real one)",
+	"Folders don't pick themselves (yet)",
+	"You had one job: choose a folder",
+	"No folder? No problem. Just kidding, it's a problem",
+	"Lost in space — please select a folder to beam us up",
+	"Your folder radar might be off... try again",
+	"Like a GPS with no destination — pick a folder!",
+	"Can't go on without a chosen one (folder, that is)",
+	"Still waiting on your folder RSVP",
+	"No folder selected. Are we playing hide and seek?",
+	"Folder not found — because you haven't picked one",
+	"Please choose a folder. The suspense is folder-ing us apart",
+	"This screen brought to you by... absolutely nothing",
+	"Zero folders selected. Maximum confusion achieved",
+	"Even Schrödinger had a box. You need a folder",
+];
