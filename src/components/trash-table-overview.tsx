@@ -34,17 +34,17 @@ import {
 } from "@/assets/helper_fns";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 
-interface TableOverviewProps {
+interface TrashTableOverviewProps {
 	currentFolder: File | null;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 	refreshKey: number;
 }
 
-export function TableOverview({
+export function TrashTableOverview({
 	currentFolder,
 	setCurrentFolder,
 	refreshKey,
-}: TableOverviewProps) {
+}: TrashTableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
@@ -52,7 +52,9 @@ export function TableOverview({
 		empty_folder_placeholders,
 		[currentFolder?.id]
 	);
-	const noFolderSelectedPlaceholder = useRandomPlaceholder(no_folder_selected_placeholders);
+	const noFolderSelectedPlaceholder = useRandomPlaceholder(
+		no_folder_selected_placeholders
+	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
@@ -61,13 +63,10 @@ export function TableOverview({
 
 		try {
 			const userId = user.id;
-			const children = await getFolderContent({
-				userId,
-				parentFolderId: currentFolder?.id,
-			});
+			const items = await getFolderContent({userId});
 
 			// Filter out trashed items or vice versa
-			const filteredItems = children.filter(item => !item.isTrash);
+			const filteredItems = items.filter((item) => item.isTrash);
 
 			// Sorting
 			const sorted = filteredItems.sort((a, b) => {
@@ -104,7 +103,14 @@ export function TableOverview({
 		if (!isLoaded || !user?.id) return;
 
 		if (currentFolder) fetchData();
-	}, [isLoaded, user?.id, currentFolder, fetchData, refreshKey, contentRefreshKey]);
+	}, [
+		isLoaded,
+		user?.id,
+		currentFolder,
+		fetchData,
+		refreshKey,
+		contentRefreshKey,
+	]);
 
 	if (!currentFolder) {
 		return (
@@ -173,20 +179,20 @@ export function TableOverview({
 									{data.name}
 								</div>
 							</TableCell>
-							<TableCell>
-								{getFileExtension(data.type)}
-							</TableCell>
+							<TableCell>{getFileExtension(data.type)}</TableCell>
 							<TableCell>
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
-							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
+							<TableCell>
+								{data.isFolder ? null : formatFileSize(data.size)}
+							</TableCell>
 							<TableCell className="relative text-right">
-									<FolderActionsDropdown
-										label={data.name}
-										fileId={data.id}
-										currentName={data.name}
-										setContentRefreshKey={setContentRefreshKey}
-									/>
+								<FolderActionsDropdown
+									label={data.name}
+									fileId={data.id}
+									currentName={data.name}
+									setContentRefreshKey={setContentRefreshKey}
+								/>
 							</TableCell>
 						</TableRow>
 					))}

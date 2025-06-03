@@ -40,6 +40,7 @@ interface AppSidebarProps {
 	selectedRootFolder: File | null;
 	setSelectedRootFolder: Dispatch<SetStateAction<File | null>>;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	setTrashOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export function AppSidebar({
@@ -47,12 +48,14 @@ export function AppSidebar({
 	selectedRootFolder,
 	setSelectedRootFolder,
 	setCurrentFolder,
+	setTrashOpen,
 }: AppSidebarProps) {
 	const { state } = useSidebar();
 	const { user, isLoaded } = useUser();
 	const [gettingFolders, setGettingFolders] = useState(true);
 	const [creatingFolder, setCreatingFolder] = useState(false);
-	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] = useState(false);
+	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] =
+		useState(false);
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
@@ -77,11 +80,10 @@ export function AppSidebar({
 				.filter((folder) => !folder.isTrash)
 				.sort((a, b) => a.name.localeCompare(b.name));
 			setRootFolders(sorted);
-			
 		} catch (error) {
 			console.error("Failed to create folder:", error);
 			toast("There was an error creating the folder.", {
-				description: useRandomPlaceholder(folder_creation_failure_placeholders)
+				description: useRandomPlaceholder(folder_creation_failure_placeholders),
 			});
 		} finally {
 			setFolderCreationLoaderVisible(false);
@@ -203,6 +205,7 @@ export function AppSidebar({
 											onClick={() => {
 												setSelectedRootFolder(folder);
 												setCurrentFolder(folder);
+												setTrashOpen(false);
 											}}
 										>
 											<SidebarMenuButton
@@ -245,7 +248,13 @@ export function AppSidebar({
 				</SidebarGroup>
 			</SidebarContent>
 			<SidebarFooter>
-				<div className="flex gap-2 cursor-pointer items-center px-3 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-colors">
+				<div
+					className="flex gap-2 cursor-pointer items-center px-3 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+					onClick={() => {
+						setTrashOpen(true);
+						setSelectedRootFolder(null);
+					}}
+				>
 					<Trash />
 					<span>Bin</span>
 				</div>

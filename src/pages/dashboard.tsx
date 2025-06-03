@@ -15,6 +15,7 @@ import { PopoverContent } from "@radix-ui/react-popover";
 import { getBreadcrumbTrail } from "@/assets/helper_fns";
 import { createFolder } from "@/api/folders";
 import { UploadPopover } from "@/components/upload-popover";
+import { TrashTableOverview } from "@/components/trash-table-overview";
 
 const Dashboard = () => {
 	const nav = useNavigate();
@@ -26,6 +27,7 @@ const Dashboard = () => {
 	const [creatingSubFolder, setCreatingSubFolder] = useState(false);
 	const [refreshSubfolders, setRefreshSubfolders] = useState(0);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const [trashOpen, setTrashOpen] = useState(false);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -80,6 +82,7 @@ const Dashboard = () => {
 				selectedRootFolder={selectedRootFolder}
 				setSelectedRootFolder={setSelectedRootFolder}
 				setCurrentFolder={setCurrentFolder}
+				setTrashOpen={setTrashOpen}
 			/>
 
 
@@ -87,6 +90,7 @@ const Dashboard = () => {
 				<BreadcrumbsHeader
 					folderTrail={breadcrumbTrail}
 					setCurrentFolder={setCurrentFolder}
+					trashOpen={trashOpen}
 				/>
 
 				{selectedRootFolder ? (
@@ -140,11 +144,20 @@ const Dashboard = () => {
 					</div>
 				) : null}
 
-				<TableOverview
-					currentFolder={currentFolder}
-					setCurrentFolder={setCurrentFolder}
-					refreshKey={refreshSubfolders}
+				{!trashOpen ? (
+					<TableOverview
+						currentFolder={currentFolder}
+						setCurrentFolder={setCurrentFolder}
+						refreshKey={refreshSubfolders}
 				/>
+				) : (
+					<TrashTableOverview
+						currentFolder={currentFolder}
+						setCurrentFolder={setCurrentFolder}
+						refreshKey={refreshSubfolders}
+					/>
+				)}
+				
 			</div>
 		</div>
 	);
