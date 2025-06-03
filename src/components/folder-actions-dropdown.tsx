@@ -8,7 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuAction } from "./ui/sidebar";
-import { ArrowDownToLine, EllipsisVertical, Loader2, Trash } from "lucide-react";
+import { ArchiveRestore, ArrowDownToLine, EllipsisVertical, Loader2, Trash } from "lucide-react";
 import { RenamePopover } from "./rename-popover";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
@@ -23,9 +23,10 @@ interface FolderActionsDropdownProps {
 	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
 	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
 	setCurrentFolder?: Dispatch<SetStateAction<File | null>>;
+	trashOpen?: boolean;
 }
 
-export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey, setCurrentFolder}: FolderActionsDropdownProps) {
+export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey, setCurrentFolder, trashOpen}: FolderActionsDropdownProps) {
 
 	const [isDeleting, setIsDeleting] = useState(false);
 	const { user } = useUser();
@@ -54,34 +55,60 @@ export function FolderActionsDropdown({label, fileId, currentName, setSidebarRef
 					<EllipsisVertical />
 				</SidebarMenuAction>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-48">
-				<DropdownMenuLabel>{label}</DropdownMenuLabel>
-				<DropdownMenuGroup>
-					<RenamePopover
-						fileId={fileId}
-						currentName={currentName}
-						setSidebarRefreshKey={setSidebarRefreshKey}
-						setContentRefreshKey={setContentRefreshKey}
-					/>
-					<DropdownMenuItem className="cursor-pointer">
-						Download
-						<DropdownMenuShortcut>
-							<ArrowDownToLine />
-						</DropdownMenuShortcut>
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						className="cursor-pointer"
-						onClick={handleDelete}
-						disabled={isDeleting}
-					>
-						<span>{isDeleting ? "Deleting..." : "Delete"}</span>
+			{!trashOpen ? (
+				<DropdownMenuContent className="w-48">
+					<DropdownMenuLabel>{label}</DropdownMenuLabel>
+					<DropdownMenuGroup>
+						<RenamePopover
+							fileId={fileId}
+							currentName={currentName}
+							setSidebarRefreshKey={setSidebarRefreshKey}
+							setContentRefreshKey={setContentRefreshKey}
+						/>
+						<DropdownMenuItem className="cursor-pointer">
+							Download
+							<DropdownMenuShortcut>
+								<ArrowDownToLine />
+							</DropdownMenuShortcut>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="cursor-pointer"
+							onClick={handleDelete}
+							disabled={isDeleting}
+						>
+							<span>{isDeleting ? "Deleting..." : "Delete"}</span>
 
-						<DropdownMenuShortcut>
-							{isDeleting ? <Loader2 className="animate-spin" /> : <Trash />}
-						</DropdownMenuShortcut>
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-			</DropdownMenuContent>
+							<DropdownMenuShortcut>
+								{isDeleting ? <Loader2 className="animate-spin" /> : <Trash />}
+							</DropdownMenuShortcut>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			) : (
+				<DropdownMenuContent className="w-48">
+					<DropdownMenuLabel>{label}</DropdownMenuLabel>
+					<DropdownMenuGroup>
+						<DropdownMenuItem className="cursor-pointer">
+							Restore
+							<DropdownMenuShortcut>
+								<ArchiveRestore />
+							</DropdownMenuShortcut>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="cursor-pointer"
+							onClick={handleDelete}
+							disabled={isDeleting}
+							variant="destructive"
+						>
+							<span>{isDeleting ? "Deleting..." : "Delete Permanently"}</span>
+
+							<DropdownMenuShortcut>
+								{isDeleting ? <Loader2 className="animate-spin" /> : <Trash />}
+							</DropdownMenuShortcut>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			)}
 		</DropdownMenu>
 	);
 }

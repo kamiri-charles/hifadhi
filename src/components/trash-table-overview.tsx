@@ -12,7 +12,6 @@ import {
 	empty_folder_placeholders,
 	fetch_success_placeholders,
 	loading_placeholders,
-	no_folder_selected_placeholders,
 } from "@/assets/punny_placeholders";
 import type { File } from "@/db/schema";
 import {
@@ -35,26 +34,22 @@ import {
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 
 interface TrashTableOverviewProps {
-	currentFolder: File | null;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	setBreadcrumbTrail: Dispatch<SetStateAction<File[]>>;
 	refreshKey: number;
+	trashOpen: boolean;
 }
 
 export function TrashTableOverview({
-	currentFolder,
 	setCurrentFolder,
+	setBreadcrumbTrail,
 	refreshKey,
+	trashOpen,
 }: TrashTableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
-	const emptyFolderPlaceholder = useRandomPlaceholder(
-		empty_folder_placeholders,
-		[currentFolder?.id]
-	);
-	const noFolderSelectedPlaceholder = useRandomPlaceholder(
-		no_folder_selected_placeholders
-	);
+	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
@@ -97,31 +92,25 @@ export function TrashTableOverview({
 		} finally {
 			setLoading(false);
 		}
-	}, [user?.id, currentFolder?.id]);
+	}, [user?.id]);
 
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
-
-		if (currentFolder) fetchData();
+		setCurrentFolder(null);
+		setBreadcrumbTrail([]);
+		fetchData();
 	}, [
 		isLoaded,
 		user?.id,
-		currentFolder,
 		fetchData,
 		refreshKey,
 		contentRefreshKey,
 	]);
 
-	if (!currentFolder) {
-		return (
-			<div className="font-medium mt-40 text-center">
-				{noFolderSelectedPlaceholder}
-			</div>
-		);
-	}
+	
 
 	// Loading
-	if (currentFolder && loading) {
+	if (loading) {
 		return (
 			<div className="flex flex-col items-center mt-40 text-center gap-2 font-medium">
 				<Loader2 size={30} className="animate-spin" />
@@ -136,8 +125,8 @@ export function TrashTableOverview({
 		);
 	}
 
-	// Empty folder
-	if (currentFolder && !loading && filesAndFolders.length === 0) {
+	// Trash empty
+	if (!loading && filesAndFolders.length === 0) {
 		return (
 			<div className="flex flex-col items-center gap-2 font-medium mt-40 text-center">
 				<FolderX size={50} />
@@ -147,7 +136,7 @@ export function TrashTableOverview({
 	}
 
 	// Content
-	if (currentFolder && !loading && filesAndFolders.length > 0) {
+	if (!loading && filesAndFolders.length > 0) {
 		return (
 			<Table>
 				<TableHeader>
@@ -192,6 +181,7 @@ export function TrashTableOverview({
 									fileId={data.id}
 									currentName={data.name}
 									setContentRefreshKey={setContentRefreshKey}
+									trashOpen={trashOpen}
 								/>
 							</TableCell>
 						</TableRow>

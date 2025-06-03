@@ -144,6 +144,7 @@ const Dashboard = () => {
 					</div>
 				) : null}
 
+
 				{!trashOpen ? (
 					<TableOverview
 						currentFolder={currentFolder}
@@ -152,9 +153,10 @@ const Dashboard = () => {
 				/>
 				) : (
 					<TrashTableOverview
-						currentFolder={currentFolder}
 						setCurrentFolder={setCurrentFolder}
+						setBreadcrumbTrail={setBreadcrumbTrail}
 						refreshKey={refreshSubfolders}
+						trashOpen={trashOpen}
 					/>
 				)}
 				
