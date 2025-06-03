@@ -108,7 +108,7 @@ export function TableOverview({
 	if (!currentFolder) {
 		return (
 			<div className="font-medium mt-40 text-center">
-				{useRandomPlaceholder(no_folder_selected_placeholders)}
+				{useRandomPlaceholder(no_folder_selected_placeholders, [])}
 			</div>
 		);
 	}
