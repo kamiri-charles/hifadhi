@@ -22,25 +22,25 @@ import {
 	type SetStateAction,
 } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { getFolderContent } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 import FolderSizeCell from "./folder-size-cell";
+import { getTrashedItems } from "@/api/general";
 
 interface TrashTableOverviewProps {
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 	setBreadcrumbTrail: Dispatch<SetStateAction<File[]>>;
-	refreshKey: number;
+	setSidebarRefreshKey: Dispatch<SetStateAction<number>>;
 	trashOpen: boolean;
 }
 
 export function TrashTableOverview({
 	setCurrentFolder,
 	setBreadcrumbTrail,
-	refreshKey,
+	setSidebarRefreshKey,
 	trashOpen,
 }: TrashTableOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
@@ -49,7 +49,7 @@ export function TrashTableOverview({
 	const emptyFolderPlaceholder = useRandomPlaceholder(
 		empty_folder_placeholders
 	);
-	const [contentRefreshKey, setContentRefreshKey] = useState(0);
+	const [refreshKey, setRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -57,7 +57,7 @@ export function TrashTableOverview({
 
 		try {
 			const userId = user.id;
-			const items = await getFolderContent({ userId });
+			const items = await getTrashedItems({ userId });
 
 			// Filter out trashed items or vice versa
 			const filteredItems = items.filter((item) => item.isTrash);
@@ -98,7 +98,7 @@ export function TrashTableOverview({
 		setCurrentFolder(null);
 		setBreadcrumbTrail([]);
 		fetchData();
-	}, [isLoaded, user?.id, fetchData, refreshKey, contentRefreshKey]);
+	}, [isLoaded, user?.id, fetchData, refreshKey]);
 
 	// Loading
 	if (loading) {
@@ -135,7 +135,8 @@ export function TrashTableOverview({
 						<TableHead className="w-[200px]">Name</TableHead>
 						<TableHead className="w-[100px]">Type</TableHead>
 						<TableHead className="w-[120px]">Created</TableHead>
-						<TableHead className="w-[40px]">Size</TableHead>
+						<TableHead className="w-[60px]">Size</TableHead>
+						<TableHead className="w-[40px]">Location</TableHead>
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -166,13 +167,17 @@ export function TrashTableOverview({
 							<TableCell>
 								<FolderSizeCell file={data} userId={user?.id} />
 							</TableCell>
+							<TableCell>
+								{data.path}
+							</TableCell>
 							<TableCell className="relative text-right">
 								<FolderActionsDropdown
 									label={data.name}
 									fileId={data.id}
 									currentName={data.name}
-									setContentRefreshKey={setContentRefreshKey}
 									trashOpen={trashOpen}
+									setContentRefreshKey={setRefreshKey}
+									setSidebarRefreshKey={setSidebarRefreshKey}
 								/>
 							</TableCell>
 						</TableRow>

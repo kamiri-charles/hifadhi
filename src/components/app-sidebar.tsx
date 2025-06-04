@@ -38,6 +38,8 @@ import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 interface AppSidebarProps {
 	identifier: string;
 	selectedRootFolder: File | null;
+	refreshKey: number;
+	setRefreshKey: Dispatch<SetStateAction<number>>;
 	setSelectedRootFolder: Dispatch<SetStateAction<File | null>>;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 	setTrashOpen: Dispatch<SetStateAction<boolean>>;
@@ -46,6 +48,8 @@ interface AppSidebarProps {
 export function AppSidebar({
 	identifier,
 	selectedRootFolder,
+	refreshKey,
+	setRefreshKey,
 	setSelectedRootFolder,
 	setCurrentFolder,
 	setTrashOpen,
@@ -58,7 +62,6 @@ export function AppSidebar({
 		useState(false);
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
-	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
 
 	const handleCreateFolder = async () => {
 		if (!user?.id || !newFolderName.trim()) return;
@@ -127,7 +130,7 @@ export function AppSidebar({
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 		fetchRootFolders();
-	}, [isLoaded, user?.id, fetchRootFolders, sidebarRefreshKey]);
+	}, [isLoaded, user?.id, fetchRootFolders, refreshKey]);
 
 	return (
 		<Sidebar className="mt-16 h-[calc(100%-4rem)]" collapsible="icon">
@@ -222,7 +225,7 @@ export function AppSidebar({
 												label={folder.name}
 												fileId={folder.id}
 												currentName={folder.name}
-												setSidebarRefreshKey={setSidebarRefreshKey}
+												setSidebarRefreshKey={setRefreshKey}
 												setCurrentFolder={setCurrentFolder}
 											/>
 										</SidebarMenuItem>

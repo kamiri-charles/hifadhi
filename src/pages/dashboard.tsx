@@ -28,6 +28,7 @@ const Dashboard = () => {
 	const [refreshSubfolders, setRefreshSubfolders] = useState(0);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const [trashOpen, setTrashOpen] = useState(false);
+	const [sidebarRefreshKey, setSidebarRefreshKey] = useState<number>(0);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -79,6 +80,8 @@ const Dashboard = () => {
 				identifier={
 					user?.username || user?.primaryEmailAddress?.emailAddress || "user"
 				}
+				refreshKey={sidebarRefreshKey}
+				setRefreshKey={setSidebarRefreshKey}
 				selectedRootFolder={selectedRootFolder}
 				setSelectedRootFolder={setSelectedRootFolder}
 				setCurrentFolder={setCurrentFolder}
@@ -155,7 +158,7 @@ const Dashboard = () => {
 					<TrashTableOverview
 						setCurrentFolder={setCurrentFolder}
 						setBreadcrumbTrail={setBreadcrumbTrail}
-						refreshKey={refreshSubfolders}
+						setSidebarRefreshKey={setSidebarRefreshKey}
 						trashOpen={trashOpen}
 					/>
 				)}

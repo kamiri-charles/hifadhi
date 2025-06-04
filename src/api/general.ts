@@ -82,3 +82,19 @@ export async function renameItem({ fileId, userId, newName }: RenameItemProps) {
 
 	return updated;
 }
+
+
+interface GetTrashedItemsProps {
+	userId: string;
+}
+
+export async function getTrashedItems({ userId }: GetTrashedItemsProps) {
+	const trashedItems = await db
+		.select()
+		.from(files)
+		.where(and(eq(files.userId, userId), eq(files.isTrash, true)))
+		.orderBy(files.updatedAt); // or any other sort like files.name
+
+	return trashedItems;
+}
+

@@ -8,7 +8,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuAction } from "./ui/sidebar";
-import { ArchiveRestore, ArrowDownToLine, EllipsisVertical, Loader2, Trash } from "lucide-react";
+import {
+	ArchiveRestore,
+	ArrowDownToLine,
+	EllipsisVertical,
+	Loader2,
+	Trash,
+} from "lucide-react";
 import { RenamePopover } from "./rename-popover";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
@@ -17,18 +23,28 @@ import { useUser } from "@clerk/clerk-react";
 import type { File } from "@/db/schema";
 
 interface FolderActionsDropdownProps {
-    label: string;
+	label: string;
 	fileId: string;
 	currentName: string;
+	trashOpen?: boolean;
+	parentId?: string | null;
 	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
 	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
 	setCurrentFolder?: Dispatch<SetStateAction<File | null>>;
-	trashOpen?: boolean;
 }
 
-export function FolderActionsDropdown({label, fileId, currentName, setSidebarRefreshKey, setContentRefreshKey, setCurrentFolder, trashOpen}: FolderActionsDropdownProps) {
-
+export function FolderActionsDropdown({
+	label,
+	fileId,
+	currentName,
+	trashOpen,
+	parentId,
+	setSidebarRefreshKey,
+	setContentRefreshKey,
+	setCurrentFolder,
+}: FolderActionsDropdownProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [isRestoring, setIsRestoring] = useState(false);
 	const { user } = useUser();
 
 	const handleDelete = async () => {
@@ -48,6 +64,25 @@ export function FolderActionsDropdown({label, fileId, currentName, setSidebarRef
 			setIsDeleting(false);
 		}
 	};
+
+	const handleRestore = async () => {
+		if (!user?.id) return toast.error("User not authenticated.");
+
+		setIsRestoring(true);
+		try {
+			await toggleTrashed({ userId: user.id, itemId: fileId });
+			toast.success("Restore successful");
+			if (!parentId && setSidebarRefreshKey) setSidebarRefreshKey((k: number) => k + 1);
+			if (setContentRefreshKey) setContentRefreshKey((k: number) => k + 1);
+			if (setCurrentFolder) setCurrentFolder(null);
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to restore file.");
+		} finally {
+			setIsRestoring(false);
+		}
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -88,7 +123,11 @@ export function FolderActionsDropdown({label, fileId, currentName, setSidebarRef
 				<DropdownMenuContent className="w-48">
 					<DropdownMenuLabel>{label}</DropdownMenuLabel>
 					<DropdownMenuGroup>
-						<DropdownMenuItem className="cursor-pointer">
+						<DropdownMenuItem
+							className="cursor-pointer"
+							onClick={handleRestore}
+							disabled={isRestoring}
+						>
 							Restore
 							<DropdownMenuShortcut>
 								<ArchiveRestore />
@@ -96,7 +135,6 @@ export function FolderActionsDropdown({label, fileId, currentName, setSidebarRef
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="cursor-pointer"
-							onClick={handleDelete}
 							disabled={isDeleting}
 							variant="destructive"
 						>
