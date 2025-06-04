@@ -105,3 +105,36 @@ export async function getFolderContent({
 
 	return data;
 }
+
+interface GetFolderSizeProps {
+	userId: string;
+	folderId: string;
+}
+
+export async function getFolderSize({ userId, folderId }: GetFolderSizeProps): Promise<number> {
+	// Helper function to recursively get all sizes of files under a folder
+	async function calculateSize(currentFolderId: string): Promise<number> {
+		// Get children of the current folder
+		const children = await db
+			.select()
+			.from(files)
+			.where(and(eq(files.userId, userId), eq(files.parentId, currentFolderId)));
+
+		let totalSize = 0;
+
+		for (const item of children) {
+			if (item.isFolder) {
+				// Recursively calculate size of subfolder
+				totalSize += await calculateSize(item.id);
+			} else {
+				// Add file size
+				totalSize += item.size;
+			}
+		}
+
+		return totalSize;
+	}
+
+	// Start the recursive calculation
+	return calculateSize(folderId);
+}

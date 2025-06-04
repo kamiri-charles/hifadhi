@@ -26,12 +26,9 @@ import { getFolderContent } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
-import {
-	formatFileSize,
-	getFileExtension,
-	getFileIcon,
-} from "@/assets/helper_fns";
+import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
+import FolderSizeCell from "./folder-size-cell";
 
 interface TrashTableOverviewProps {
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
@@ -49,7 +46,9 @@ export function TrashTableOverview({
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
-	const emptyFolderPlaceholder = useRandomPlaceholder(empty_folder_placeholders);
+	const emptyFolderPlaceholder = useRandomPlaceholder(
+		empty_folder_placeholders
+	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
@@ -58,7 +57,7 @@ export function TrashTableOverview({
 
 		try {
 			const userId = user.id;
-			const items = await getFolderContent({userId});
+			const items = await getFolderContent({ userId });
 
 			// Filter out trashed items or vice versa
 			const filteredItems = items.filter((item) => item.isTrash);
@@ -99,15 +98,7 @@ export function TrashTableOverview({
 		setCurrentFolder(null);
 		setBreadcrumbTrail([]);
 		fetchData();
-	}, [
-		isLoaded,
-		user?.id,
-		fetchData,
-		refreshKey,
-		contentRefreshKey,
-	]);
-
-	
+	}, [isLoaded, user?.id, fetchData, refreshKey, contentRefreshKey]);
 
 	// Loading
 	if (loading) {
@@ -173,7 +164,7 @@ export function TrashTableOverview({
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
 							<TableCell>
-								{data.isFolder ? null : formatFileSize(data.size)}
+								<FolderSizeCell file={data} userId={user?.id} />
 							</TableCell>
 							<TableCell className="relative text-right">
 								<FolderActionsDropdown

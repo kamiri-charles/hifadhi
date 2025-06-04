@@ -27,12 +27,9 @@ import { getFolderContent } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
-import {
-	formatFileSize,
-	getFileExtension,
-	getFileIcon,
-} from "@/assets/helper_fns";
+import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
+import FolderSizeCell from "./folder-size-cell";
 
 interface TableOverviewProps {
 	currentFolder: File | null;
@@ -52,7 +49,9 @@ export function TableOverview({
 		empty_folder_placeholders,
 		[currentFolder?.id]
 	);
-	const noFolderSelectedPlaceholder = useRandomPlaceholder(no_folder_selected_placeholders);
+	const noFolderSelectedPlaceholder = useRandomPlaceholder(
+		no_folder_selected_placeholders
+	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
@@ -67,7 +66,7 @@ export function TableOverview({
 			});
 
 			// Filter out trashed items or vice versa
-			const filteredItems = children.filter(item => !item.isTrash);
+			const filteredItems = children.filter((item) => !item.isTrash);
 
 			// Sorting
 			const sorted = filteredItems.sort((a, b) => {
@@ -102,9 +101,15 @@ export function TableOverview({
 
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
-
 		if (currentFolder) fetchData();
-	}, [isLoaded, user?.id, currentFolder, fetchData, refreshKey, contentRefreshKey]);
+	}, [
+		isLoaded,
+		user?.id,
+		currentFolder,
+		fetchData,
+		refreshKey,
+		contentRefreshKey,
+	]);
 
 	if (!currentFolder) {
 		return (
@@ -173,20 +178,20 @@ export function TableOverview({
 									{data.name}
 								</div>
 							</TableCell>
-							<TableCell>
-								{getFileExtension(data.type)}
-							</TableCell>
+							<TableCell>{getFileExtension(data.type)}</TableCell>
 							<TableCell>
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
-							<TableCell>{data.isFolder ? null : formatFileSize(data.size)}</TableCell>
+							<TableCell>
+								<FolderSizeCell file={data} userId={user?.id} />
+							</TableCell>
 							<TableCell className="relative text-right">
-									<FolderActionsDropdown
-										label={data.name}
-										fileId={data.id}
-										currentName={data.name}
-										setContentRefreshKey={setContentRefreshKey}
-									/>
+								<FolderActionsDropdown
+									label={data.name}
+									fileId={data.id}
+									currentName={data.name}
+									setContentRefreshKey={setContentRefreshKey}
+								/>
 							</TableCell>
 						</TableRow>
 					))}
