@@ -29,16 +29,21 @@ import {
 	ContextMenuShortcut,
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { RenameDialog } from "./rename-dialog";
 
 interface FlexOverviewProps {
 	currentFolder: File | null;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	renameDialogOpen: boolean;
+	setRenameDialogOpen: Dispatch<SetStateAction<boolean>>;
 	refreshKey: number;
 }
 
 export function FlexOverview({
 	currentFolder,
 	setCurrentFolder,
+	renameDialogOpen,
+	setRenameDialogOpen,
 	refreshKey,
 }: FlexOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
@@ -52,7 +57,10 @@ export function FlexOverview({
 		no_folder_selected_placeholders
 	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
-    const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
+		null
+	);
+	const [contextedItem, setContextedItem] = useState<File | null>(null);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -157,6 +165,7 @@ export function FlexOverview({
 						key={idx}
 						onClick={() => setHighlightedItemId(item.id)}
 						onDoubleClick={() => item.isFolder && setCurrentFolder(item)}
+						onContextMenu={() => setContextedItem(item)}
 					>
 						<ContextMenu>
 							<ContextMenuTrigger>
@@ -176,6 +185,7 @@ export function FlexOverview({
 								<ContextMenuItem
 									inset
 									className="cursor-pointer"
+									onClick={() => setCurrentFolder(item)}
 									disabled={!item.isFolder}
 								>
 									Open
@@ -183,7 +193,15 @@ export function FlexOverview({
 								<ContextMenuItem inset className="cursor-pointer">
 									Download
 								</ContextMenuItem>
-								<ContextMenuItem inset className="cursor-pointer">
+								<ContextMenuItem
+									inset
+									className="cursor-pointer"
+									onClick={() => {
+										requestAnimationFrame(() => {
+											setRenameDialogOpen(true);
+										});
+									}}
+								>
 									Rename
 									<ContextMenuShortcut>f2</ContextMenuShortcut>
 								</ContextMenuItem>
@@ -206,6 +224,16 @@ export function FlexOverview({
 						</ContextMenu>
 					</div>
 				))}
+
+				{contextedItem && (
+					<RenameDialog
+						open={renameDialogOpen}
+						onOpenChange={setRenameDialogOpen}
+						fileId={contextedItem.id}
+						defaultValue={contextedItem.name}
+						setContentRefreshKey={setContentRefreshKey}
+					/>
+				)}
 			</div>
 		);
 	}

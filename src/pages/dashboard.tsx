@@ -32,6 +32,7 @@ const Dashboard = () => {
 	const [trashOpen, setTrashOpen] = useState(false);
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState<number>(0);
 	const [view, setView] = useState<string>("table");
+	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -78,6 +79,8 @@ const Dashboard = () => {
 				<FlexOverview
 					currentFolder={currentFolder}
 					setCurrentFolder={setCurrentFolder}
+					renameDialogOpen={renameDialogOpen}
+					setRenameDialogOpen={setRenameDialogOpen}
 					refreshKey={refreshSubfolders}
 				/>
 			);
