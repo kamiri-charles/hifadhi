@@ -1,3 +1,4 @@
+import { type Dispatch, type SetStateAction } from "react";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -6,20 +7,20 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import type { File } from "@/db/schema";
-import { type Dispatch, type SetStateAction } from "react";
+import type { ItemType } from "@/db/schema";
 
 interface BreadcrumbsHeaderProps {
-	folderTrail: File[];
-	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	folderTrail: ItemType[];
 	trashOpen: boolean;
+	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 }
 
 export function BreadcrumbsHeader({
 	folderTrail,
-	setCurrentFolder,
 	trashOpen,
+	setCurrentFolder,
 }: BreadcrumbsHeaderProps) {
+
 	return (
 		<Breadcrumb>
 			<BreadcrumbList>

@@ -94,7 +94,7 @@ export function RenameDialog({
 
 				<DialogFooter className="sm:justify-end flex gap-2">
 					<DialogClose asChild>
-						<Button type="button" variant="secondary" disabled={isLoading}>
+						<Button type="button" variant="secondary" disabled={isLoading} className="cursor-pointer">
 							Cancel
 						</Button>
 					</DialogClose>
@@ -105,7 +105,7 @@ export function RenameDialog({
 							Renaming...
 						</Button>
 					) : (
-						<Button variant="default" onClick={handleRename}>
+						<Button variant="default" onClick={handleRename} className="cursor-pointer">
 							Rename
 						</Button>
 					)}

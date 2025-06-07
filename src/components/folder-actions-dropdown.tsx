@@ -20,19 +20,19 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
 import { toggleTrashed } from "@/api/general";
 import { useUser } from "@clerk/clerk-react";
-import type { File } from "@/db/schema";
+import type { ItemType } from "@/db/schema";
 
 interface FolderActionsDropdownProps {
 	label: string;
 	fileId: string;
 	trashOpen?: boolean;
 	parentId?: string | null;
-	itemInstance?: File;
+	itemInstance?: ItemType;
 	setRenameDialogOpen?: Dispatch<SetStateAction<boolean>>;
-	setContextedItem?: Dispatch<SetStateAction<File | null>>;
+	setContextedItem?: Dispatch<SetStateAction<ItemType | null>>;
 	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
 	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
-	setCurrentFolder?: Dispatch<SetStateAction<File | null>>;
+	setCurrentFolder?: Dispatch<SetStateAction<ItemType | null>>;
 }
 
 export function FolderActionsDropdown({

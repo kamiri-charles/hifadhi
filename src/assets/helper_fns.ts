@@ -1,5 +1,5 @@
 import { getFolderById } from "@/api/folders";
-import type { File } from "@/db/schema";
+import type { ItemType } from "@/db/schema";
 
 import {
 	FileText,
@@ -35,8 +35,8 @@ export function getFileIcon(extension: string, isFolder = false){
 }
 
 
-export async function getBreadcrumbTrail(folder: File, userId: string): Promise<File[]> {
-	const trail: File[] = [folder];
+export async function getBreadcrumbTrail(folder: ItemType, userId: string): Promise<ItemType[]> {
+	const trail: ItemType[] = [folder];
 	let current = folder;
 
 	while (current.parentId) {

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Check, FolderPlus, Loader2, Search } from "lucide-react";
 import { TableOverview } from "@/components/table-overview";
 import { toast } from "sonner";
-import type { File } from "@/db/schema";
+import type { ItemType } from "@/db/schema";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { getBreadcrumbTrail } from "@/assets/helper_fns";
@@ -22,17 +22,17 @@ import { FlexOverview } from "@/components/flex-overview";
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
-	const [selectedRootFolder, setSelectedRootFolder] = useState<File | null>(null);
-	const [breadcrumbTrail, setBreadcrumbTrail] = useState<File[]>([]);
-	const [currentFolder, setCurrentFolder] = useState<File | null>(null);
+	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(null);
+	const [breadcrumbTrail, setBreadcrumbTrail] = useState<ItemType[]>([]);
+	const [currentFolder, setCurrentFolder] = useState<ItemType | null>(null);
 	const [subFolderName, setSubFolderName] = useState<string>("");
 	const [creatingSubFolder, setCreatingSubFolder] = useState(false);
-	const [refreshSubfolders, setRefreshSubfolders] = useState(0);
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const [trashOpen, setTrashOpen] = useState(false);
-	const [sidebarRefreshKey, setSidebarRefreshKey] = useState<number>(0);
-	const [view, setView] = useState<string>("table");
 	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+	const [view, setView] = useState<string>("table");
+	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
+	const [contentRefreshKey, setContentRefreshKey] = useState(0);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -46,7 +46,7 @@ const Dashboard = () => {
 				parentId: currentFolder.id,
 			});
 
-			setRefreshSubfolders((prev) => prev + 1);
+			setContentRefreshKey((prev) => prev + 1);
 			setIsPopoverOpen(false);
 			toast("Folder created", {
 				description: `Welcome to your new folder: "${newFolder.name}"`,
@@ -69,7 +69,7 @@ const Dashboard = () => {
 				<TableOverview
 					currentFolder={currentFolder}
 					setCurrentFolder={setCurrentFolder}
-					refreshKey={refreshSubfolders}
+					refreshKey={contentRefreshKey}
 				/>
 			);
 		}
@@ -81,7 +81,7 @@ const Dashboard = () => {
 					setCurrentFolder={setCurrentFolder}
 					renameDialogOpen={renameDialogOpen}
 					setRenameDialogOpen={setRenameDialogOpen}
-					refreshKey={refreshSubfolders}
+					refreshKey={contentRefreshKey}
 				/>
 			);
 		}
@@ -120,8 +120,8 @@ const Dashboard = () => {
 			<div className="flex-1 h-full p-4">
 				<BreadcrumbsHeader
 					folderTrail={breadcrumbTrail}
-					setCurrentFolder={setCurrentFolder}
 					trashOpen={trashOpen}
+					setCurrentFolder={setCurrentFolder}
 				/>
 
 				{selectedRootFolder ? (

@@ -13,7 +13,7 @@ import {
 	fetch_success_placeholders,
 	loading_placeholders,
 } from "@/assets/punny_placeholders";
-import type { File } from "@/db/schema";
+import type { ItemType } from "@/db/schema";
 import {
 	useCallback,
 	useEffect,
@@ -31,8 +31,8 @@ import FolderSizeCell from "./folder-size-cell";
 import { getTrashedItems } from "@/api/general";
 
 interface TrashTableOverviewProps {
-	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
-	setBreadcrumbTrail: Dispatch<SetStateAction<File[]>>;
+	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
+	setBreadcrumbTrail: Dispatch<SetStateAction<ItemType[]>>;
 	setSidebarRefreshKey: Dispatch<SetStateAction<number>>;
 	trashOpen: boolean;
 }
@@ -43,7 +43,7 @@ export function TrashTableOverview({
 	setSidebarRefreshKey,
 	trashOpen,
 }: TrashTableOverviewProps) {
-	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
+	const [filesAndFolders, setFilesAndFolders] = useState<ItemType[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
 	const emptyFolderPlaceholder = useRandomPlaceholder(

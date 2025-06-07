@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { getFolderSize } from "@/api/folders";
 import { formatFileSize } from "@/assets/helper_fns";
 import { Loader2 } from "lucide-react";
-import { type File } from "@/db/schema";
+import { type ItemType } from "@/db/schema";
 
-export default function FolderSizeCell({ file, userId }: { file: File; userId: string | undefined }) {
+export default function FolderSizeCell({ file, userId }: { file: ItemType; userId: string | undefined }) {
 	const [size, setSize] = useState<number | null>(null);
 
 	useEffect(() => {

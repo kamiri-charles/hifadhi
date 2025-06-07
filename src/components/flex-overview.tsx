@@ -6,7 +6,7 @@ import {
 	loading_placeholders,
 	no_folder_selected_placeholders,
 } from "@/assets/punny_placeholders";
-import { type File } from "@/db/schema";
+import { type ItemType } from "@/db/schema";
 import {
 	useCallback,
 	useEffect,
@@ -32,8 +32,8 @@ import {
 import { RenameDialog } from "./rename-dialog";
 
 interface FlexOverviewProps {
-	currentFolder: File | null;
-	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	currentFolder: ItemType | null;
+	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 	renameDialogOpen: boolean;
 	setRenameDialogOpen: Dispatch<SetStateAction<boolean>>;
 	refreshKey: number;
@@ -46,7 +46,7 @@ export function FlexOverview({
 	setRenameDialogOpen,
 	refreshKey,
 }: FlexOverviewProps) {
-	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
+	const [filesAndFolders, setFilesAndFolders] = useState<ItemType[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
 	const emptyFolderPlaceholder = useRandomPlaceholder(
@@ -60,7 +60,7 @@ export function FlexOverview({
 	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
 		null
 	);
-	const [contextedItem, setContextedItem] = useState<File | null>(null);
+	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;

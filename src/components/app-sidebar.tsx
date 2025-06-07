@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import type { File } from "@/db/schema";
+import type { ItemType } from "@/db/schema";
 import { createFolder, getFolderContent } from "@/api/folders";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
@@ -38,11 +38,11 @@ import { RenameDialog } from "./rename-dialog";
 
 interface AppSidebarProps {
 	identifier: string;
-	selectedRootFolder: File | null;
+	selectedRootFolder: ItemType | null;
 	refreshKey: number;
 	setRefreshKey: Dispatch<SetStateAction<number>>;
-	setSelectedRootFolder: Dispatch<SetStateAction<File | null>>;
-	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
+	setSelectedRootFolder: Dispatch<SetStateAction<ItemType | null>>;
+	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 	setTrashOpen: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -61,9 +61,9 @@ export function AppSidebar({
 	const [creatingFolder, setCreatingFolder] = useState(false);
 	const [folderCreationLoaderVisible, setFolderCreationLoaderVisible] =
 		useState(false);
-	const [rootFolders, setRootFolders] = useState<File[]>([]);
+	const [rootFolders, setRootFolders] = useState<ItemType[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
-	const [contextedItem, setContextedItem] = useState<File | null>(null);
+	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
 	const [sidebarRenameDialogOpen, setSidebarRenameDialogOpen] = useState(false);
 
 	const handleCreateFolder = async () => {
