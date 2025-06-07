@@ -197,9 +197,7 @@ export function FlexOverview({
 									inset
 									className="cursor-pointer"
 									onClick={() => {
-										requestAnimationFrame(() => {
-											setRenameDialogOpen(true);
-										});
+										requestAnimationFrame(() => setRenameDialogOpen(true));
 									}}
 								>
 									Rename

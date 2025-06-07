@@ -34,6 +34,7 @@ import {
 } from "@/assets/punny_placeholders";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
+import { RenameDialog } from "./rename-dialog";
 
 interface AppSidebarProps {
 	identifier: string;
@@ -62,6 +63,8 @@ export function AppSidebar({
 		useState(false);
 	const [rootFolders, setRootFolders] = useState<File[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
+	const [contextedItem, setContextedItem] = useState<File | null>(null);
+	const [sidebarRenameDialogOpen, setSidebarRenameDialogOpen] = useState(false);
 
 	const handleCreateFolder = async () => {
 		if (!user?.id || !newFolderName.trim()) return;
@@ -224,9 +227,11 @@ export function AppSidebar({
 											<FolderActionsDropdown
 												label={folder.name}
 												fileId={folder.id}
-												currentName={folder.name}
+												itemInstance={folder}
 												setSidebarRefreshKey={setRefreshKey}
 												setCurrentFolder={setCurrentFolder}
+												setRenameDialogOpen={setSidebarRenameDialogOpen}
+												setContextedItem={setContextedItem}
 											/>
 										</SidebarMenuItem>
 									))}
@@ -262,6 +267,16 @@ export function AppSidebar({
 					<span>Bin</span>
 				</div>
 			</SidebarFooter>
+
+			{contextedItem && (
+				<RenameDialog
+					open={sidebarRenameDialogOpen}
+					onOpenChange={setSidebarRenameDialogOpen}
+					fileId={contextedItem.id}
+					defaultValue={contextedItem.name}
+					setSidebarRefreshKey={setRefreshKey}
+				/>
+			)}
 		</Sidebar>
 	);
 }

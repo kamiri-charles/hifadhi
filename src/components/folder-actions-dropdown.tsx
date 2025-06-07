@@ -13,9 +13,9 @@ import {
 	ArrowDownToLine,
 	EllipsisVertical,
 	Loader2,
+	Pen,
 	Trash,
 } from "lucide-react";
-import { RenamePopover } from "./rename-popover";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
 import { toggleTrashed } from "@/api/general";
@@ -25,9 +25,11 @@ import type { File } from "@/db/schema";
 interface FolderActionsDropdownProps {
 	label: string;
 	fileId: string;
-	currentName: string;
 	trashOpen?: boolean;
 	parentId?: string | null;
+	itemInstance?: File;
+	setRenameDialogOpen?: Dispatch<SetStateAction<boolean>>;
+	setContextedItem?: Dispatch<SetStateAction<File | null>>;
 	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
 	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
 	setCurrentFolder?: Dispatch<SetStateAction<File | null>>;
@@ -36,9 +38,11 @@ interface FolderActionsDropdownProps {
 export function FolderActionsDropdown({
 	label,
 	fileId,
-	currentName,
 	trashOpen,
 	parentId,
+	itemInstance,
+	setRenameDialogOpen,
+	setContextedItem,
 	setSidebarRefreshKey,
 	setContentRefreshKey,
 	setCurrentFolder,
@@ -84,7 +88,9 @@ export function FolderActionsDropdown({
 	};
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu onOpenChange={() => {
+			if (itemInstance && setContextedItem) setContextedItem(itemInstance)
+		}}>
 			<DropdownMenuTrigger asChild>
 				<SidebarMenuAction className="cursor-pointer">
 					<EllipsisVertical />
@@ -94,12 +100,20 @@ export function FolderActionsDropdown({
 				<DropdownMenuContent className="w-48">
 					<DropdownMenuLabel>{label}</DropdownMenuLabel>
 					<DropdownMenuGroup>
-						<RenamePopover
-							fileId={fileId}
-							currentName={currentName}
-							setSidebarRefreshKey={setSidebarRefreshKey}
-							setContentRefreshKey={setContentRefreshKey}
-						/>
+						<DropdownMenuItem
+							className="cursor-pointer"
+							onClick={() => {
+								if (setRenameDialogOpen) {
+									requestAnimationFrame(() => setRenameDialogOpen(true));
+								};
+							}}
+						>
+							Rename
+							<DropdownMenuShortcut>
+								<Pen />
+							</DropdownMenuShortcut>
+						</DropdownMenuItem>
+
 						<DropdownMenuItem className="cursor-pointer">
 							Download
 							<DropdownMenuShortcut>
