@@ -30,6 +30,7 @@ import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { FolderActionsDropdown } from "./folder-actions-dropdown";
 import FolderSizeCell from "./folder-size-cell";
+import { RenameDialog } from "./rename-dialog";
 
 interface TableOverviewProps {
 	currentFolder: File | null;
@@ -53,6 +54,8 @@ export function TableOverview({
 		no_folder_selected_placeholders
 	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
+	const [tbRenameDialogOpen, setTbRenameDialogOpen] = useState(false);
+	const [contextedItem, setContextedItem] = useState<File | null>(null);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -187,13 +190,26 @@ export function TableOverview({
 								<FolderActionsDropdown
 									label={data.name}
 									fileId={data.id}
-									currentName={data.name}
+									itemInstance={data}
+									setCurrentFolder={setCurrentFolder}
+									setRenameDialogOpen={setTbRenameDialogOpen}
+									setContextedItem={setContextedItem}
 									setContentRefreshKey={setContentRefreshKey}
 								/>
 							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
+
+				{contextedItem && (
+					<RenameDialog
+						open={tbRenameDialogOpen}
+						onOpenChange={setTbRenameDialogOpen}
+						fileId={contextedItem.id}
+						defaultValue={contextedItem.name}
+						setContentRefreshKey={setContentRefreshKey}
+					/>
+				)}
 			</Table>
 		);
 	}
