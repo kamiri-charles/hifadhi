@@ -1,11 +1,3 @@
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import { FolderX, Loader2 } from "lucide-react";
 import {
 	db_offline_placeholders,
@@ -14,7 +6,7 @@ import {
 	loading_placeholders,
 	no_folder_selected_placeholders,
 } from "@/assets/punny_placeholders";
-import type { File } from "@/db/schema";
+import { type File } from "@/db/schema";
 import {
 	useCallback,
 	useEffect,
@@ -28,20 +20,27 @@ import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
-import { FolderActionsDropdown } from "./folder-actions-dropdown";
 import FolderSizeCell from "./folder-size-cell";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuSeparator,
+	ContextMenuShortcut,
+	ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
-interface TableOverviewProps {
+interface FlexOverviewProps {
 	currentFolder: File | null;
 	setCurrentFolder: Dispatch<SetStateAction<File | null>>;
 	refreshKey: number;
 }
 
-export function TableOverview({
+export function FlexOverview({
 	currentFolder,
 	setCurrentFolder,
 	refreshKey,
-}: TableOverviewProps) {
+}: FlexOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<File[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
@@ -53,6 +52,7 @@ export function TableOverview({
 		no_folder_selected_placeholders
 	);
 	const [contentRefreshKey, setContentRefreshKey] = useState(0);
+    const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -148,53 +148,65 @@ export function TableOverview({
 	// Content
 	if (currentFolder && !loading && filesAndFolders.length > 0) {
 		return (
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead className="w-[200px]">Name</TableHead>
-						<TableHead className="w-[100px]">Type</TableHead>
-						<TableHead className="w-[120px]">Created</TableHead>
-						<TableHead className="w-[40px]">Size</TableHead>
-						<TableHead className="text-right">Actions</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{filesAndFolders.map((data) => (
-						<TableRow key={data.name}>
-							<TableCell
-								className="cursor-pointer"
-								onClick={() => data.isFolder && setCurrentFolder(data)}
-							>
-								<div className="flex items-center gap-2">
+			<div className="flex flex-wrap gap-4 p-4">
+				{filesAndFolders.map((item, idx) => (
+					<div
+						className={`flex flex-col items-center gap-2 p-2 rounded w-30 cursor-pointer transition-colors hover:bg-accent${
+							highlightedItemId == item.id ? " bg-accent" : ""
+						}`}
+						key={idx}
+						onClick={() => setHighlightedItemId(item.id)}
+						onDoubleClick={() => item.isFolder && setCurrentFolder(item)}
+					>
+						<ContextMenu>
+							<ContextMenuTrigger>
+								<div className="flex items-center justify-center">
 									{(() => {
 										const Icon = getFileIcon(
-											data.name.split(".").pop() || "",
-											data.type === "folder"
+											item.name.split(".").pop() || "",
+											item.type === "folder"
 										);
-										return <Icon className="w-4 h-4" />;
+										return <Icon size={50} />;
 									})()}
-									{data.name}
 								</div>
-							</TableCell>
-							<TableCell>{getFileExtension(data.type)}</TableCell>
-							<TableCell>
-								{format(new Date(data.createdAt), "MMM d, yyyy")}
-							</TableCell>
-							<TableCell>
-								<FolderSizeCell file={data} userId={user?.id} />
-							</TableCell>
-							<TableCell className="relative text-right">
-								<FolderActionsDropdown
-									label={data.name}
-									fileId={data.id}
-									currentName={data.name}
-									setContentRefreshKey={setContentRefreshKey}
-								/>
-							</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+
+								<div className="text-xs">{item.name}</div>
+							</ContextMenuTrigger>
+							<ContextMenuContent className="w-52">
+								<ContextMenuItem
+									inset
+									className="cursor-pointer"
+									disabled={!item.isFolder}
+								>
+									Open
+								</ContextMenuItem>
+								<ContextMenuItem inset className="cursor-pointer">
+									Download
+								</ContextMenuItem>
+								<ContextMenuItem inset className="cursor-pointer">
+									Rename
+									<ContextMenuShortcut>f2</ContextMenuShortcut>
+								</ContextMenuItem>
+
+								<ContextMenuItem inset className="cursor-pointer">
+									Delete
+									<ContextMenuShortcut>del</ContextMenuShortcut>
+								</ContextMenuItem>
+
+								<ContextMenuSeparator />
+
+								<div className="flex items-center justify-end text-gray-400 text-xs gap-1">
+									<span>{format(new Date(item.createdAt), "MMM d, yyyy")}</span>
+									<span>|</span>
+									<FolderSizeCell file={item} userId={user?.id} />
+									<span>|</span>
+									<span>{getFileExtension(item.type)}</span>
+								</div>
+							</ContextMenuContent>
+						</ContextMenu>
+					</div>
+				))}
+			</div>
 		);
 	}
 }

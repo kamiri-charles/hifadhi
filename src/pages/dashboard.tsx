@@ -16,6 +16,8 @@ import { getBreadcrumbTrail } from "@/assets/helper_fns";
 import { createFolder } from "@/api/folders";
 import { UploadPopover } from "@/components/upload-popover";
 import { TrashTableOverview } from "@/components/trash-table-overview";
+import { ViewToggle } from "@/components/view-toggle";
+import { FlexOverview } from "@/components/flex-overview";
 
 const Dashboard = () => {
 	const nav = useNavigate();
@@ -29,6 +31,7 @@ const Dashboard = () => {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const [trashOpen, setTrashOpen] = useState(false);
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState<number>(0);
+	const [view, setView] = useState<string>("table");
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -58,6 +61,28 @@ const Dashboard = () => {
 			setCreatingSubFolder(false);
 		}
 	};
+
+	const dataDisplay = () => {
+		if (view == "table") {
+			return (
+				<TableOverview
+					currentFolder={currentFolder}
+					setCurrentFolder={setCurrentFolder}
+					refreshKey={refreshSubfolders}
+				/>
+			);
+		}
+
+		if (view == "flex") {
+			return (
+				<FlexOverview
+					currentFolder={currentFolder}
+					setCurrentFolder={setCurrentFolder}
+					refreshKey={refreshSubfolders}
+				/>
+			);
+		}
+	}
 
 	useEffect(() => {
 		if (!isLoaded) return;
@@ -98,6 +123,7 @@ const Dashboard = () => {
 
 				{selectedRootFolder ? (
 					<div className="flex justify-end gap-2">
+						<ViewToggle view={view} setView={setView} />
 						<UploadPopover userId={user?.id} parentId={currentFolder?.id} />
 
 						<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -149,11 +175,7 @@ const Dashboard = () => {
 
 
 				{!trashOpen ? (
-					<TableOverview
-						currentFolder={currentFolder}
-						setCurrentFolder={setCurrentFolder}
-						refreshKey={refreshSubfolders}
-				/>
+					dataDisplay()
 				) : (
 					<TrashTableOverview
 						setCurrentFolder={setCurrentFolder}
@@ -169,3 +191,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
