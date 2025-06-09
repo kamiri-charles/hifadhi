@@ -86,6 +86,7 @@ const Dashboard = () => {
 				identifier={
 					user?.username || user?.primaryEmailAddress?.emailAddress || "user"
 				}
+				trashOpen={trashOpen}
 				refreshKey={sidebarRefreshKey}
 				setRefreshKey={setSidebarRefreshKey}
 				selectedRootFolder={selectedRootFolder}
@@ -111,7 +112,7 @@ const Dashboard = () => {
 							<PopoverTrigger>
 								<Button
 									size="icon"
-									className="text-white bg-indigo-800 rounded-full hover:bg-blue-600"
+									className="text-white bg-indigo-800 rounded-full hover:bg-blue-600 cursor-pointer"
 								>
 									<FolderPlus />
 								</Button>

@@ -9,7 +9,7 @@ export function AppHeader() {
 	const { isSignedIn } = useAuth();
 	const nav = useNavigate();
 	return (
-		<header className="flex items-baseline justify-between fixed top-0 left-0 w-full py-4 px-4 lg:px-10 border-b-2">
+		<header className="flex items-baseline justify-between fixed top-0 left-0 w-full py-4 px-4 lg:px-10 border-b-2 h-16">
 			<div className="flex items-baseline gap-2">
 				{isSignedIn ? <CustomSidebarTrigger /> : null}
 

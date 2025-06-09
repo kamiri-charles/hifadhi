@@ -109,7 +109,7 @@ export function UploadPopover({ parentId, userId }: UploadPopoverProps) {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button className="bg-indigo-800 text-white hover:bg-blue-600">
+				<Button className="bg-indigo-800 text-white hover:bg-blue-600 cursor-pointer">
 					Upload
 				</Button>
 			</PopoverTrigger>

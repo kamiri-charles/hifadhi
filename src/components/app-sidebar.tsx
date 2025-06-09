@@ -1,12 +1,10 @@
 import {
 	useState,
-	type Dispatch,
-	type SetStateAction,
 	useEffect,
 	useCallback,
+	type Dispatch,
+	type SetStateAction,
 } from "react";
-import { Check, Folder, Loader2, Plus, Trash, X } from "lucide-react";
-
 import {
 	Sidebar,
 	SidebarContent,
@@ -36,10 +34,12 @@ import { ItemActionsDropdown } from "./item-actions-dropdown";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { RenameDialog } from "./rename-dialog";
 import { updateItemInListById } from "@/assets/helper_fns";
+import { Check, Folder, Loader2, Plus, Trash, X } from "lucide-react";
 
 interface AppSidebarProps {
 	identifier: string;
 	selectedRootFolder: ItemType | null;
+	trashOpen: boolean;
 	refreshKey: number;
 	setRefreshKey: Dispatch<SetStateAction<number>>;
 	setSelectedRootFolder: Dispatch<SetStateAction<ItemType | null>>;
@@ -51,6 +51,7 @@ interface AppSidebarProps {
 export function AppSidebar({
 	identifier,
 	selectedRootFolder,
+	trashOpen,
 	refreshKey,
 	setRefreshKey,
 	setSelectedRootFolder,
@@ -258,16 +259,21 @@ export function AppSidebar({
 					)}
 				</SidebarGroup>
 			</SidebarContent>
+			
 			<SidebarFooter>
 				<div
-					className="flex gap-2 cursor-pointer items-center px-3 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-colors"
+					className={`${trashOpen ? "bg-accent " : ""} cursor-pointer`}
 					onClick={() => {
 						setTrashOpen(true);
-						setSelectedRootFolder(null);
+						setCurrentFolder(null);
 					}}
 				>
-					<Trash />
-					<span>Bin</span>
+					<SidebarMenuButton asChild>
+						<div>
+							<Trash />
+							<span>Trash</span>
+						</div>
+					</SidebarMenuButton>
 				</div>
 			</SidebarFooter>
 
