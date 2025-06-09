@@ -10,13 +10,13 @@ import {
 import type { ItemType } from "@/db/schema";
 
 interface BreadcrumbsHeaderProps {
-	folderTrail: ItemType[];
+	trail: ItemType[];
 	trashOpen: boolean;
 	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 }
 
 export function BreadcrumbsHeader({
-	folderTrail,
+	trail,
 	trashOpen,
 	setCurrentFolder,
 }: BreadcrumbsHeaderProps) {
@@ -29,9 +29,9 @@ export function BreadcrumbsHeader({
 						<BreadcrumbPage>Trash</BreadcrumbPage>
 					</BreadcrumbItem>
 				) : (
-					folderTrail.map((folder, index) => (
+					trail.map((folder, index) => (
 						<BreadcrumbItem key={folder.id}>
-							{index < folderTrail.length - 1 ? (
+							{index < trail.length - 1 ? (
 								<>
 									<BreadcrumbLink
 										onClick={() => setCurrentFolder(folder)}

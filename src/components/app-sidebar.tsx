@@ -45,6 +45,7 @@ interface AppSidebarProps {
 	setSelectedRootFolder: Dispatch<SetStateAction<ItemType | null>>;
 	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 	setTrashOpen: Dispatch<SetStateAction<boolean>>;
+	setBreadcrumbTrail: Dispatch<SetStateAction<ItemType[]>>;
 }
 
 export function AppSidebar({
@@ -55,6 +56,7 @@ export function AppSidebar({
 	setSelectedRootFolder,
 	setCurrentFolder,
 	setTrashOpen,
+	setBreadcrumbTrail,
 }: AppSidebarProps) {
 	const { state } = useSidebar();
 	const { user, isLoaded } = useUser();
@@ -281,6 +283,9 @@ export function AppSidebar({
 						);
 						setContextedItem((prev) =>
 							prev ? { ...prev, name: newName } : null
+						);
+						setBreadcrumbTrail((prev) =>
+							updateItemInListById(prev, contextedItem.id, { name: newName })
 						);
 					}}
 				/>

@@ -22,21 +22,19 @@ import { toast } from "sonner";
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
-	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(
-		null
-	);
+	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(null);
 	const [breadcrumbTrail, setBreadcrumbTrail] = useState<ItemType[]>([]);
 	const [currentFolder, setCurrentFolder] = useState<ItemType | null>(null);
 	const [subFolderName, setSubFolderName] = useState<string>("");
-	const [creatingSubFolder, setCreatingSubFolder] = useState(false);
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-	const [trashOpen, setTrashOpen] = useState(false);
-	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
 	const [view, setView] = useState<string>("table"); // default table view
+	const [items, setItems] = useState<ItemType[]>([]);
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+	const [creatingSubFolder, setCreatingSubFolder] = useState(false);
+	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+	const [trashOpen, setTrashOpen] = useState(false);
+	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
 	const [itemsOverviewRefreshKey, setItemsOverviewRefreshKey] = useState(0);
-	const [items, setItems] = useState<ItemType[]>([]);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -74,6 +72,7 @@ const Dashboard = () => {
 			if (currentFolder && user?.id) {
 				const trail = await getBreadcrumbTrail(currentFolder, user.id);
 				setBreadcrumbTrail(trail);
+				
 			}
 		};
 
@@ -93,11 +92,12 @@ const Dashboard = () => {
 				setSelectedRootFolder={setSelectedRootFolder}
 				setCurrentFolder={setCurrentFolder}
 				setTrashOpen={setTrashOpen}
+				setBreadcrumbTrail={setBreadcrumbTrail}
 			/>
 
 			<div className="flex-1 h-full p-4">
 				<BreadcrumbsHeader
-					folderTrail={breadcrumbTrail}
+					trail={breadcrumbTrail}
 					trashOpen={trashOpen}
 					setCurrentFolder={setCurrentFolder}
 				/>
