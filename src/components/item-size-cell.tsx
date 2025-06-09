@@ -4,7 +4,7 @@ import { formatFileSize } from "@/assets/helper_fns";
 import { Loader2 } from "lucide-react";
 import { type ItemType } from "@/db/schema";
 
-export default function FolderSizeCell({ file, userId }: { file: ItemType; userId: string | undefined }) {
+export default function ItemSizeCell({ file, userId }: { file: ItemType; userId: string | undefined }) {
 	const [size, setSize] = useState<number | null>(null);
 
 	useEffect(() => {

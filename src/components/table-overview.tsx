@@ -28,8 +28,8 @@ import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
-import { FolderActionsDropdown } from "./folder-actions-dropdown";
-import FolderSizeCell from "./folder-size-cell";
+import { ItemActionsDropdown } from "./item-actions-dropdown";
+import ItemSizeCell from "./item-size-cell";
 import { RenameDialog } from "./rename-dialog";
 
 interface TableOverviewProps {
@@ -184,10 +184,10 @@ export function TableOverview({
 								{format(new Date(data.createdAt), "MMM d, yyyy")}
 							</TableCell>
 							<TableCell>
-								<FolderSizeCell file={data} userId={user?.id} />
+								<ItemSizeCell file={data} userId={user?.id} />
 							</TableCell>
 							<TableCell className="relative text-right">
-								<FolderActionsDropdown
+								<ItemActionsDropdown
 									label={data.name}
 									fileId={data.id}
 									itemInstance={data}

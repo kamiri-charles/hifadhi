@@ -22,7 +22,7 @@ import { toggleTrashed } from "@/api/general";
 import { useUser } from "@clerk/clerk-react";
 import type { ItemType } from "@/db/schema";
 
-interface FolderActionsDropdownProps {
+interface ItemActionsDropdownProps {
 	label: string;
 	fileId: string;
 	trashOpen?: boolean;
@@ -35,7 +35,7 @@ interface FolderActionsDropdownProps {
 	setCurrentFolder?: Dispatch<SetStateAction<ItemType | null>>;
 }
 
-export function FolderActionsDropdown({
+export function ItemActionsDropdown({
 	label,
 	fileId,
 	trashOpen,
@@ -46,7 +46,7 @@ export function FolderActionsDropdown({
 	setSidebarRefreshKey,
 	setContentRefreshKey,
 	setCurrentFolder,
-}: FolderActionsDropdownProps) {
+}: ItemActionsDropdownProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isRestoring, setIsRestoring] = useState(false);
 	const { user } = useUser();

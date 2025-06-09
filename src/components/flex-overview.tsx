@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
-import FolderSizeCell from "./folder-size-cell";
+import ItemSizeCell from "./item-size-cell";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -214,7 +214,7 @@ export function FlexOverview({
 								<div className="flex items-center justify-end text-gray-400 text-xs gap-1">
 									<span>{format(new Date(item.createdAt), "MMM d, yyyy")}</span>
 									<span>|</span>
-									<FolderSizeCell file={item} userId={user?.id} />
+									<ItemSizeCell file={item} userId={user?.id} />
 									<span>|</span>
 									<span>{getFileExtension(item.type)}</span>
 								</div>

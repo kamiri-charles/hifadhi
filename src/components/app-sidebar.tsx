@@ -32,7 +32,7 @@ import {
 	folder_creation_failure_placeholders,
 	loading_placeholders,
 } from "@/assets/punny_placeholders";
-import { FolderActionsDropdown } from "./folder-actions-dropdown";
+import { ItemActionsDropdown } from "./item-actions-dropdown";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { RenameDialog } from "./rename-dialog";
 
@@ -224,7 +224,7 @@ export function AppSidebar({
 												</div>
 											</SidebarMenuButton>
 
-											<FolderActionsDropdown
+											<ItemActionsDropdown
 												label={folder.name}
 												fileId={folder.id}
 												itemInstance={folder}
