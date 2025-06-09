@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Cloud, Folder, Layers, Shield, Zap } from "lucide-react";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/app-header";
 import { toast } from "sonner";
 
 const Landing = () => {

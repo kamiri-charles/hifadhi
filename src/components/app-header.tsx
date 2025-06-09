@@ -5,7 +5,7 @@ import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
 import { Cloud } from "lucide-react";
 
-const Navbar = () => {
+export function AppHeader() {
 	const { isSignedIn } = useAuth();
 	const nav = useNavigate();
 	return (
@@ -46,5 +46,3 @@ const Navbar = () => {
 		</header>
 	);
 };
-
-export default Navbar;

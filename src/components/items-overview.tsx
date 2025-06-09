@@ -30,19 +30,35 @@ import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { ItemActionsDropdown } from "./item-actions-dropdown";
 import ItemSizeCell from "./item-size-cell";
-import { RenameDialog } from "./rename-dialog";
 
-interface TableOverviewProps {
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuSeparator,
+	ContextMenuShortcut,
+	ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+
+interface ItemsOverviewProps {
 	currentFolder: ItemType | null;
-	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
+	view: string;
 	refreshKey: number;
+	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
+	setRefreshKey: Dispatch<SetStateAction<number>>;
+	setContextedItem: Dispatch<SetStateAction<ItemType | null>>;
+	setRenameDialogOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function TableOverview({
+export function ItemsOverview({
 	currentFolder,
-	setCurrentFolder,
+	view,
 	refreshKey,
-}: TableOverviewProps) {
+	setCurrentFolder,
+	setRefreshKey,
+	setContextedItem,
+	setRenameDialogOpen,
+}: ItemsOverviewProps) {
 	const [filesAndFolders, setFilesAndFolders] = useState<ItemType[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
@@ -52,10 +68,10 @@ export function TableOverview({
 	);
 	const noFolderSelectedPlaceholder = useRandomPlaceholder(
 		no_folder_selected_placeholders
+	);	
+	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
+		null
 	);
-	const [contentRefreshKey, setContentRefreshKey] = useState(0);
-	const [tbRenameDialogOpen, setTbRenameDialogOpen] = useState(false);
-	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -111,7 +127,6 @@ export function TableOverview({
 		currentFolder,
 		fetchData,
 		refreshKey,
-		contentRefreshKey,
 	]);
 
 	if (!currentFolder) {
@@ -150,7 +165,9 @@ export function TableOverview({
 
 	// Content
 	if (currentFolder && !loading && filesAndFolders.length > 0) {
-		return (
+		/* Table view */
+		if (view == "table") {
+			return (
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -192,25 +209,92 @@ export function TableOverview({
 									fileId={data.id}
 									itemInstance={data}
 									setCurrentFolder={setCurrentFolder}
-									setRenameDialogOpen={setTbRenameDialogOpen}
+									setRenameDialogOpen={setRenameDialogOpen}
 									setContextedItem={setContextedItem}
-									setContentRefreshKey={setContentRefreshKey}
+									setContentRefreshKey={setRefreshKey}
 								/>
 							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
-
-				{contextedItem && (
-					<RenameDialog
-						open={tbRenameDialogOpen}
-						onOpenChange={setTbRenameDialogOpen}
-						fileId={contextedItem.id}
-						defaultValue={contextedItem.name}
-						setContentRefreshKey={setContentRefreshKey}
-					/>
-				)}
 			</Table>
 		);
+		}
+
+		/* Flex view */
+		if (view == "flex") {
+			return (
+				<div className="flex flex-wrap gap-4 p-4">
+					{filesAndFolders.map((item, idx) => (
+						<div
+							className={`flex flex-col items-center gap-2 p-2 rounded w-30 cursor-pointer transition-colors hover:bg-accent${
+								highlightedItemId == item.id ? " bg-accent" : ""
+							}`}
+							key={idx}
+							onClick={() => setHighlightedItemId(item.id)}
+							onDoubleClick={() => item.isFolder && setCurrentFolder(item)}
+							onContextMenu={() => setContextedItem(item)}
+						>
+							<ContextMenu>
+								<ContextMenuTrigger>
+									<div className="flex items-center justify-center">
+										{(() => {
+											const Icon = getFileIcon(
+												item.name.split(".").pop() || "",
+												item.type === "folder"
+											);
+											return <Icon size={50} />;
+										})()}
+									</div>
+
+									<div className="text-xs">{item.name}</div>
+								</ContextMenuTrigger>
+								<ContextMenuContent className="w-52">
+									<ContextMenuItem
+										inset
+										className="cursor-pointer"
+										onClick={() => setCurrentFolder(item)}
+										disabled={!item.isFolder}
+									>
+										Open
+									</ContextMenuItem>
+									<ContextMenuItem inset className="cursor-pointer">
+										Download
+									</ContextMenuItem>
+									<ContextMenuItem
+										inset
+										className="cursor-pointer"
+										onClick={() => {
+											requestAnimationFrame(() => setRenameDialogOpen(true));
+										}}
+									>
+										Rename
+										<ContextMenuShortcut>f2</ContextMenuShortcut>
+									</ContextMenuItem>
+
+									<ContextMenuItem inset className="cursor-pointer">
+										Delete
+										<ContextMenuShortcut>del</ContextMenuShortcut>
+									</ContextMenuItem>
+
+									<ContextMenuSeparator />
+
+									<div className="flex items-center justify-end text-gray-400 text-xs gap-1">
+										<span>
+											{format(new Date(item.createdAt), "MMM d, yyyy")}
+										</span>
+										<span>|</span>
+										<ItemSizeCell file={item} userId={user?.id} />
+										<span>|</span>
+										<span>{getFileExtension(item.type)}</span>
+									</div>
+								</ContextMenuContent>
+							</ContextMenu>
+						</div>
+					))}
+				</div>
+			);
+		}
+		
 	}
 }

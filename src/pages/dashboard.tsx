@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import type { ItemType } from "@/db/schema";
+import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BreadcrumbsHeader } from "@/components/breadcrumbs-header";
-import Navbar from "@/components/navbar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Check, FolderPlus, Loader2, Search } from "lucide-react";
-import { TableOverview } from "@/components/table-overview";
-import { toast } from "sonner";
-import type { ItemType } from "@/db/schema";
+import { ItemsOverview } from "@/components/items-overview";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { getBreadcrumbTrail } from "@/assets/helper_fns";
-import { createFolder } from "@/api/folders";
 import { UploadPopover } from "@/components/upload-popover";
 import { TrashTableOverview } from "@/components/trash-table-overview";
 import { ViewToggle } from "@/components/view-toggle";
-import { FlexOverview } from "@/components/flex-overview";
+import { RenameDialog } from "@/components/rename-dialog";
+import { Check, FolderPlus, Loader2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { createFolder } from "@/api/folders";
+import { toast } from "sonner";
 
 const Dashboard = () => {
 	const nav = useNavigate();
@@ -30,9 +30,10 @@ const Dashboard = () => {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 	const [trashOpen, setTrashOpen] = useState(false);
 	const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-	const [view, setView] = useState<string>("table");
+	const [contextedItem, setContextedItem] = useState<ItemType | null>(null);
+	const [view, setView] = useState<string>("table"); // default table view
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
-	const [contentRefreshKey, setContentRefreshKey] = useState(0);
+	const [itemsOverviewRefreshKey, setItemsOverviewRefreshKey] = useState(0);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -46,7 +47,7 @@ const Dashboard = () => {
 				parentId: currentFolder.id,
 			});
 
-			setContentRefreshKey((prev) => prev + 1);
+			setItemsOverviewRefreshKey((prev) => prev + 1);
 			setIsPopoverOpen(false);
 			toast("Folder created", {
 				description: `Welcome to your new folder: "${newFolder.name}"`,
@@ -63,29 +64,7 @@ const Dashboard = () => {
 		}
 	};
 
-	const dataDisplay = () => {
-		if (view == "table") {
-			return (
-				<TableOverview
-					currentFolder={currentFolder}
-					setCurrentFolder={setCurrentFolder}
-					refreshKey={contentRefreshKey}
-				/>
-			);
-		}
 
-		if (view == "flex") {
-			return (
-				<FlexOverview
-					currentFolder={currentFolder}
-					setCurrentFolder={setCurrentFolder}
-					renameDialogOpen={renameDialogOpen}
-					setRenameDialogOpen={setRenameDialogOpen}
-					refreshKey={contentRefreshKey}
-				/>
-			);
-		}
-	}
 
 	useEffect(() => {
 		if (!isLoaded) return;
@@ -103,7 +82,7 @@ const Dashboard = () => {
 
 	return (
 		<div className="flex mt-16 h-full">
-			<Navbar />
+			<AppHeader />
 			<AppSidebar
 				identifier={
 					user?.username || user?.primaryEmailAddress?.emailAddress || "user"
@@ -115,7 +94,6 @@ const Dashboard = () => {
 				setCurrentFolder={setCurrentFolder}
 				setTrashOpen={setTrashOpen}
 			/>
-
 
 			<div className="flex-1 h-full p-4">
 				<BreadcrumbsHeader
@@ -164,10 +142,7 @@ const Dashboard = () => {
 						</Popover>
 
 						<div className="relative w-[250px]">
-							<Input
-								placeholder="Search"
-								className="pr-10"
-							/>
+							<Input placeholder="Search" className="pr-10" />
 							<Search
 								className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
 								size={18}
@@ -176,9 +151,16 @@ const Dashboard = () => {
 					</div>
 				) : null}
 
-
 				{!trashOpen ? (
-					dataDisplay()
+					<ItemsOverview
+						currentFolder={currentFolder}
+						refreshKey={itemsOverviewRefreshKey}
+						view={view}
+						setCurrentFolder={setCurrentFolder}
+						setRefreshKey={setItemsOverviewRefreshKey}
+						setContextedItem={setContextedItem}
+						setRenameDialogOpen={setRenameDialogOpen}
+					/>
 				) : (
 					<TrashTableOverview
 						setCurrentFolder={setCurrentFolder}
@@ -187,8 +169,16 @@ const Dashboard = () => {
 						trashOpen={trashOpen}
 					/>
 				)}
-				
 			</div>
+
+			{contextedItem && (
+				<RenameDialog
+					open={renameDialogOpen}
+					onOpenChange={setRenameDialogOpen}
+					fileId={contextedItem.id}
+					defaultValue={contextedItem.name}
+				/>
+			)}
 		</div>
 	);
 };
