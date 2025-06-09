@@ -61,3 +61,12 @@ export function getFileExtension(mimeType: string): string {
 	return mimeType.split("/").pop() || "";
 }
 
+type Identifiable = { id: string };
+
+export function updateItemInListById<T extends Identifiable>(
+	list: T[],
+	id: string,
+	update: Partial<T>
+): T[] {
+	return list.map((item) => (item.id === id ? { ...item, ...update } : item));
+}

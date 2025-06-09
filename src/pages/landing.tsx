@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Cloud, Folder, Layers, Shield, Zap } from "lucide-react";
-import Navbar from "@/components/app-header";
+import { AppHeader } from "@/components/app-header";
 import { toast } from "sonner";
 
 const Landing = () => {
@@ -15,7 +15,7 @@ const Landing = () => {
 	}, [isSignedIn, isLoaded]);
 	return (
 		<div className="w-full h-full flex flex-wrap items-center justify-around px-10 overflow-auto relative isolate bg-white/5 py-24 sm:py-32">
-			<Navbar />
+			<AppHeader />
 
 			<div className="h-full flex flex-col flex-wrap gap-1 mt-40 lg:mt-30">
 				<h2 className="text-5xl">Store your files with ease</h2>

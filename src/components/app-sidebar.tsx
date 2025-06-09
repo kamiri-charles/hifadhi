@@ -35,6 +35,7 @@ import {
 import { ItemActionsDropdown } from "./item-actions-dropdown";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { RenameDialog } from "./rename-dialog";
+import { updateItemInListById } from "@/assets/helper_fns";
 
 interface AppSidebarProps {
 	identifier: string;
@@ -274,7 +275,14 @@ export function AppSidebar({
 					onOpenChange={setSidebarRenameDialogOpen}
 					fileId={contextedItem.id}
 					defaultValue={contextedItem.name}
-					setSidebarRefreshKey={setRefreshKey}
+					onRenameSuccess={(newName) => {
+						setRootFolders((prev) =>
+							updateItemInListById(prev, contextedItem.id, { name: newName })
+						);
+						setContextedItem((prev) =>
+							prev ? { ...prev, name: newName } : null
+						);
+					}}
 				/>
 			)}
 		</Sidebar>

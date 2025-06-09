@@ -41,9 +41,11 @@ import {
 } from "@/components/ui/context-menu";
 
 interface ItemsOverviewProps {
-	currentFolder: ItemType | null;
+	items: ItemType[];
 	view: string;
+	currentFolder: ItemType | null;
 	refreshKey: number;
+	setItems: Dispatch<SetStateAction<ItemType[]>>;
 	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
 	setRefreshKey: Dispatch<SetStateAction<number>>;
 	setContextedItem: Dispatch<SetStateAction<ItemType | null>>;
@@ -51,15 +53,16 @@ interface ItemsOverviewProps {
 }
 
 export function ItemsOverview({
-	currentFolder,
+	items,
 	view,
+	currentFolder,
 	refreshKey,
+	setItems,
 	setCurrentFolder,
 	setRefreshKey,
 	setContextedItem,
 	setRenameDialogOpen,
 }: ItemsOverviewProps) {
-	const [filesAndFolders, setFilesAndFolders] = useState<ItemType[]>([]);
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
 	const emptyFolderPlaceholder = useRandomPlaceholder(
@@ -68,7 +71,7 @@ export function ItemsOverview({
 	);
 	const noFolderSelectedPlaceholder = useRandomPlaceholder(
 		no_folder_selected_placeholders
-	);	
+	);
 	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
 		null
 	);
@@ -94,7 +97,7 @@ export function ItemsOverview({
 				return a.name.localeCompare(b.name);
 			});
 
-			setFilesAndFolders(sorted);
+			setItems(sorted);
 			toast("Fetch successful", {
 				description:
 					fetch_success_placeholders[
@@ -121,13 +124,7 @@ export function ItemsOverview({
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
 		if (currentFolder) fetchData();
-	}, [
-		isLoaded,
-		user?.id,
-		currentFolder,
-		fetchData,
-		refreshKey,
-	]);
+	}, [isLoaded, user?.id, currentFolder, fetchData, refreshKey]);
 
 	if (!currentFolder) {
 		return (
@@ -154,7 +151,7 @@ export function ItemsOverview({
 	}
 
 	// Empty folder
-	if (currentFolder && !loading && filesAndFolders.length === 0) {
+	if (currentFolder && !loading && items.length === 0) {
 		return (
 			<div className="flex flex-col items-center gap-2 font-medium mt-40 text-center">
 				<FolderX size={50} />
@@ -164,68 +161,68 @@ export function ItemsOverview({
 	}
 
 	// Content
-	if (currentFolder && !loading && filesAndFolders.length > 0) {
+	if (currentFolder && !loading && items.length > 0) {
 		/* Table view */
 		if (view == "table") {
 			return (
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead className="w-[200px]">Name</TableHead>
-						<TableHead className="w-[100px]">Type</TableHead>
-						<TableHead className="w-[120px]">Created</TableHead>
-						<TableHead className="w-[40px]">Size</TableHead>
-						<TableHead className="text-right">Actions</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{filesAndFolders.map((data) => (
-						<TableRow key={data.name}>
-							<TableCell
-								className="cursor-pointer"
-								onClick={() => data.isFolder && setCurrentFolder(data)}
-							>
-								<div className="flex items-center gap-2">
-									{(() => {
-										const Icon = getFileIcon(
-											data.name.split(".").pop() || "",
-											data.type === "folder"
-										);
-										return <Icon className="w-4 h-4" />;
-									})()}
-									{data.name}
-								</div>
-							</TableCell>
-							<TableCell>{getFileExtension(data.type)}</TableCell>
-							<TableCell>
-								{format(new Date(data.createdAt), "MMM d, yyyy")}
-							</TableCell>
-							<TableCell>
-								<ItemSizeCell file={data} userId={user?.id} />
-							</TableCell>
-							<TableCell className="relative text-right">
-								<ItemActionsDropdown
-									label={data.name}
-									fileId={data.id}
-									itemInstance={data}
-									setCurrentFolder={setCurrentFolder}
-									setRenameDialogOpen={setRenameDialogOpen}
-									setContextedItem={setContextedItem}
-									setContentRefreshKey={setRefreshKey}
-								/>
-							</TableCell>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead className="w-[200px]">Name</TableHead>
+							<TableHead className="w-[100px]">Type</TableHead>
+							<TableHead className="w-[120px]">Created</TableHead>
+							<TableHead className="w-[40px]">Size</TableHead>
+							<TableHead className="text-right">Actions</TableHead>
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		);
+					</TableHeader>
+					<TableBody>
+						{items.map((item) => (
+							<TableRow key={item.name}>
+								<TableCell
+									className="cursor-pointer"
+									onClick={() => item.isFolder && setCurrentFolder(item)}
+								>
+									<div className="flex items-center gap-2">
+										{(() => {
+											const Icon = getFileIcon(
+												item.name.split(".").pop() || "",
+												item.type === "folder"
+											);
+											return <Icon className="w-4 h-4" />;
+										})()}
+										{item.name}
+									</div>
+								</TableCell>
+								<TableCell>{getFileExtension(item.type)}</TableCell>
+								<TableCell>
+									{format(new Date(item.createdAt), "MMM d, yyyy")}
+								</TableCell>
+								<TableCell>
+									<ItemSizeCell file={item} userId={user?.id} />
+								</TableCell>
+								<TableCell className="relative text-right">
+									<ItemActionsDropdown
+										label={item.name}
+										fileId={item.id}
+										itemInstance={item}
+										setCurrentFolder={setCurrentFolder}
+										setRenameDialogOpen={setRenameDialogOpen}
+										setContextedItem={setContextedItem}
+										setContentRefreshKey={setRefreshKey}
+									/>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			);
 		}
 
 		/* Flex view */
 		if (view == "flex") {
 			return (
 				<div className="flex flex-wrap gap-4 p-4">
-					{filesAndFolders.map((item, idx) => (
+					{items.map((item, idx) => (
 						<div
 							className={`flex flex-col items-center gap-2 p-2 rounded w-30 cursor-pointer transition-colors hover:bg-accent${
 								highlightedItemId == item.id ? " bg-accent" : ""
@@ -295,6 +292,5 @@ export function ItemsOverview({
 				</div>
 			);
 		}
-		
 	}
 }

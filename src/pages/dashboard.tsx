@@ -8,7 +8,7 @@ import { BreadcrumbsHeader } from "@/components/breadcrumbs-header";
 import { ItemsOverview } from "@/components/items-overview";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-import { getBreadcrumbTrail } from "@/assets/helper_fns";
+import { getBreadcrumbTrail, updateItemInListById } from "@/assets/helper_fns";
 import { UploadPopover } from "@/components/upload-popover";
 import { TrashTableOverview } from "@/components/trash-table-overview";
 import { ViewToggle } from "@/components/view-toggle";
@@ -22,7 +22,9 @@ import { toast } from "sonner";
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
-	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(null);
+	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(
+		null
+	);
 	const [breadcrumbTrail, setBreadcrumbTrail] = useState<ItemType[]>([]);
 	const [currentFolder, setCurrentFolder] = useState<ItemType | null>(null);
 	const [subFolderName, setSubFolderName] = useState<string>("");
@@ -34,6 +36,7 @@ const Dashboard = () => {
 	const [view, setView] = useState<string>("table"); // default table view
 	const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
 	const [itemsOverviewRefreshKey, setItemsOverviewRefreshKey] = useState(0);
+	const [items, setItems] = useState<ItemType[]>([]);
 
 	const handleCreate = async () => {
 		if (!subFolderName.trim() || !currentFolder) return;
@@ -52,7 +55,6 @@ const Dashboard = () => {
 			toast("Folder created", {
 				description: `Welcome to your new folder: "${newFolder.name}"`,
 			});
-
 		} catch (error) {
 			console.error("Error creating folder:", error);
 			toast("Folder creation failed", {
@@ -64,8 +66,6 @@ const Dashboard = () => {
 		}
 	};
 
-
-
 	useEffect(() => {
 		if (!isLoaded) return;
 		if (!isSignedIn) nav("/sign-in");
@@ -73,7 +73,7 @@ const Dashboard = () => {
 		const fetchTrail = async () => {
 			if (currentFolder && user?.id) {
 				const trail = await getBreadcrumbTrail(currentFolder, user.id);
-			setBreadcrumbTrail(trail);
+				setBreadcrumbTrail(trail);
 			}
 		};
 
@@ -153,9 +153,11 @@ const Dashboard = () => {
 
 				{!trashOpen ? (
 					<ItemsOverview
+						items={items}
+						view={view}
 						currentFolder={currentFolder}
 						refreshKey={itemsOverviewRefreshKey}
-						view={view}
+						setItems={setItems}
 						setCurrentFolder={setCurrentFolder}
 						setRefreshKey={setItemsOverviewRefreshKey}
 						setContextedItem={setContextedItem}
@@ -177,6 +179,14 @@ const Dashboard = () => {
 					onOpenChange={setRenameDialogOpen}
 					fileId={contextedItem.id}
 					defaultValue={contextedItem.name}
+					onRenameSuccess={(newName) => {
+						setItems((prev) =>
+							updateItemInListById(prev, contextedItem.id, { name: newName })
+						);
+						setContextedItem((prev) =>
+							prev ? { ...prev, name: newName } : null
+						);
+					}}
 				/>
 			)}
 		</div>
@@ -184,5 +194,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-

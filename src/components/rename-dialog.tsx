@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -23,8 +23,7 @@ interface RenameDialogProps {
 	onOpenChange: (open: boolean) => void;
 	defaultValue?: string;
 	fileId: string;
-	setSidebarRefreshKey?: Dispatch<SetStateAction<number>>;
-	setContentRefreshKey?: Dispatch<SetStateAction<number>>;
+	onRenameSuccess?: (newName: string) => void;
 }
 
 export function RenameDialog({
@@ -32,8 +31,7 @@ export function RenameDialog({
 	onOpenChange,
 	defaultValue = "",
 	fileId,
-	setSidebarRefreshKey,
-	setContentRefreshKey,
+	onRenameSuccess,
 }: RenameDialogProps) {
 	const { user, isLoaded } = useUser();
 	const [newName, setNewName] = useState(defaultValue);
@@ -62,8 +60,7 @@ export function RenameDialog({
                 description: rename_success_messages[Math.floor(Math.random() * rename_success_messages.length)]
             });
 			onOpenChange(false); // close the dialog
-			if (setSidebarRefreshKey) setSidebarRefreshKey((prev) => prev + 1);
-			if (setContentRefreshKey) setContentRefreshKey((prev) => prev + 1);
+			onRenameSuccess?.(newName);
 		} catch (error: any) {
 			console.error(error);
 			toast.error(error.message || "Rename failed");
