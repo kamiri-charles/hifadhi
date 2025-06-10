@@ -266,6 +266,7 @@ export function AppSidebar({
 					onClick={() => {
 						setTrashOpen(true);
 						setCurrentFolder(null);
+						setSelectedRootFolder(null);
 					}}
 				>
 					<SidebarMenuButton asChild>

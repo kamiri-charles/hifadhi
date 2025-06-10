@@ -10,7 +10,7 @@ import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { getBreadcrumbTrail, updateItemInListById } from "@/assets/helper_fns";
 import { UploadPopover } from "@/components/upload-popover";
-import { TrashTableOverview } from "@/components/trash-table-overview";
+import { TrashOverview } from "@/components/trash-overview";
 import { ViewToggle } from "@/components/view-toggle";
 import { RenameDialog } from "@/components/rename-dialog";
 import { Check, FolderPlus, Loader2, Search } from "lucide-react";
@@ -22,7 +22,9 @@ import { toast } from "sonner";
 const Dashboard = () => {
 	const nav = useNavigate();
 	const { user, isSignedIn, isLoaded } = useUser();
-	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(null);
+	const [selectedRootFolder, setSelectedRootFolder] = useState<ItemType | null>(
+		null
+	);
 	const [breadcrumbTrail, setBreadcrumbTrail] = useState<ItemType[]>([]);
 	const [currentFolder, setCurrentFolder] = useState<ItemType | null>(null);
 	const [subFolderName, setSubFolderName] = useState<string>("");
@@ -72,7 +74,6 @@ const Dashboard = () => {
 			if (currentFolder && user?.id) {
 				const trail = await getBreadcrumbTrail(currentFolder, user.id);
 				setBreadcrumbTrail(trail);
-				
 			}
 		};
 
@@ -103,20 +104,25 @@ const Dashboard = () => {
 					setCurrentFolder={setCurrentFolder}
 				/>
 
-				{selectedRootFolder ? (
+				{selectedRootFolder || trashOpen ? (
 					<div className="flex justify-end gap-2">
 						<ViewToggle view={view} setView={setView} />
-						<UploadPopover userId={user?.id} parentId={currentFolder?.id} />
+
+						{!trashOpen && (
+							<UploadPopover userId={user?.id} parentId={currentFolder?.id} />
+						)}
 
 						<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-							<PopoverTrigger>
-								<Button
-									size="icon"
-									className="text-white bg-indigo-800 rounded-full hover:bg-blue-600 cursor-pointer"
-								>
-									<FolderPlus />
-								</Button>
-							</PopoverTrigger>
+							{!trashOpen && (
+								<PopoverTrigger>
+									<Button
+										size="icon"
+										className="text-white bg-indigo-800 rounded-full hover:bg-blue-600 cursor-pointer"
+									>
+										<FolderPlus />
+									</Button>
+								</PopoverTrigger>
+							)}
 
 							<PopoverContent className="w-64 p-4 rounded bg-accent mt-2 z-10">
 								<div className="flex items-center gap-2">
@@ -165,11 +171,15 @@ const Dashboard = () => {
 						setRenameDialogOpen={setRenameDialogOpen}
 					/>
 				) : (
-					<TrashTableOverview
+					<TrashOverview
+						items={items}
+						view={view}
+						trashOpen={trashOpen}
+						setItems={setItems}
 						setCurrentFolder={setCurrentFolder}
 						setBreadcrumbTrail={setBreadcrumbTrail}
 						setSidebarRefreshKey={setSidebarRefreshKey}
-						trashOpen={trashOpen}
+						setContextedItem={setContextedItem}
 					/>
 				)}
 			</div>

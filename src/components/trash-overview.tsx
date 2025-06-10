@@ -19,61 +19,55 @@ import {
 	empty_folder_placeholders,
 	fetch_success_placeholders,
 	loading_placeholders,
-	no_folder_selected_placeholders,
 } from "@/assets/punny_placeholders";
 import type { ItemType } from "@/db/schema";
 import { useUser } from "@clerk/clerk-react";
-import { getFolderContent } from "@/api/folders";
 import { toast } from "sonner";
 import { useRandomPlaceholder } from "@/hooks/useRandomPlaceholder";
 import { format } from "date-fns";
 import { getFileExtension, getFileIcon } from "@/assets/helper_fns";
 import { ItemActionsDropdown } from "./item-actions-dropdown";
 import ItemSizeCell from "./item-size-cell";
+import { getTrashedItems, toggleTrashed } from "@/api/general";
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuSeparator,
-	ContextMenuShortcut,
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
-interface ItemsOverviewProps {
+interface TrashOverviewProps {
 	items: ItemType[];
 	view: string;
-	currentFolder: ItemType | null;
-	refreshKey: number;
+	trashOpen: boolean;
 	setItems: Dispatch<SetStateAction<ItemType[]>>;
 	setCurrentFolder: Dispatch<SetStateAction<ItemType | null>>;
-	setRefreshKey: Dispatch<SetStateAction<number>>;
+	setBreadcrumbTrail: Dispatch<SetStateAction<ItemType[]>>;
+	setSidebarRefreshKey: Dispatch<SetStateAction<number>>;
 	setContextedItem: Dispatch<SetStateAction<ItemType | null>>;
-	setRenameDialogOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function ItemsOverview({
+export function TrashOverview({
 	items,
 	view,
-	currentFolder,
-	refreshKey,
+	trashOpen,
 	setItems,
 	setCurrentFolder,
-	setRefreshKey,
+	setBreadcrumbTrail,
+	setSidebarRefreshKey,
 	setContextedItem,
-	setRenameDialogOpen,
-}: ItemsOverviewProps) {
+}: TrashOverviewProps) {
 	const [loading, setLoading] = useState(true);
 	const { user, isLoaded } = useUser();
 	const emptyFolderPlaceholder = useRandomPlaceholder(
-		empty_folder_placeholders,
-		[currentFolder?.id]
-	);
-	const noFolderSelectedPlaceholder = useRandomPlaceholder(
-		no_folder_selected_placeholders
+		empty_folder_placeholders
 	);
 	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
 		null
 	);
+	const [restoring, setRestoring] = useState(false);
+	const [refreshKey, setRefreshKey] = useState(0);
 
 	const fetchData = useCallback(async () => {
 		if (!user?.id) return;
@@ -81,13 +75,10 @@ export function ItemsOverview({
 
 		try {
 			const userId = user.id;
-			const children = await getFolderContent({
-				userId,
-				parentFolderId: currentFolder?.id,
-			});
+			const items = await getTrashedItems({ userId });
 
 			// Filter out trashed items or vice versa
-			const filteredItems = children.filter((item) => !item.isTrash);
+			const filteredItems = items.filter((item) => item.isTrash);
 
 			// Sorting
 			const sorted = filteredItems.sort((a, b) => {
@@ -118,23 +109,36 @@ export function ItemsOverview({
 		} finally {
 			setLoading(false);
 		}
-	}, [user?.id, currentFolder?.id]);
+	}, [user?.id]);
+
+	const handleRestore = async ({item}: {item: ItemType}) => {
+		if (!user?.id) return toast.error("User not authenticated.");
+
+		setRestoring(true);
+		try {
+			await toggleTrashed({ userId: user.id, itemId: item.id });
+			toast.success("Restore successful");
+			if (!item.parentId && setSidebarRefreshKey)
+				setSidebarRefreshKey((k: number) => k + 1);
+			setRefreshKey((k: number) => k + 1);
+			if (setCurrentFolder) setCurrentFolder(null);
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to restore file.");
+		} finally {
+			setRestoring(false);
+		}
+	};
 
 	useEffect(() => {
 		if (!isLoaded || !user?.id) return;
-		if (currentFolder) fetchData();
-	}, [isLoaded, user?.id, currentFolder, fetchData, refreshKey]);
-
-	if (!currentFolder) {
-		return (
-			<div className="font-medium mt-40 text-center">
-				{noFolderSelectedPlaceholder}
-			</div>
-		);
-	}
+		setCurrentFolder(null);
+		setBreadcrumbTrail([]);
+		fetchData();
+	}, [isLoaded, user?.id, fetchData, refreshKey]);
 
 	// Loading
-	if (currentFolder && loading) {
+	if (loading) {
 		return (
 			<div className="flex flex-col items-center mt-40 text-center gap-2 font-medium">
 				<Loader2 size={30} className="animate-spin" />
@@ -149,8 +153,8 @@ export function ItemsOverview({
 		);
 	}
 
-	// Empty folder
-	if (currentFolder && !loading && items.length === 0) {
+	// Trash empty
+	if (!loading && items.length === 0) {
 		return (
 			<div className="flex flex-col items-center gap-2 font-medium mt-40 text-center">
 				<FolderX size={50} />
@@ -160,8 +164,7 @@ export function ItemsOverview({
 	}
 
 	// Content
-	if (currentFolder && !loading && items.length > 0) {
-		/* Table view */
+	if (!loading && items.length > 0) {
 		if (view == "table") {
 			return (
 				<Table>
@@ -170,7 +173,8 @@ export function ItemsOverview({
 							<TableHead className="w-[200px]">Name</TableHead>
 							<TableHead className="w-[100px]">Type</TableHead>
 							<TableHead className="w-[120px]">Created</TableHead>
-							<TableHead className="w-[40px]">Size</TableHead>
+							<TableHead className="w-[60px]">Size</TableHead>
+							<TableHead className="w-[40px]">Location</TableHead>
 							<TableHead className="text-right">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -179,7 +183,9 @@ export function ItemsOverview({
 							<TableRow key={item.name}>
 								<TableCell
 									className="cursor-pointer"
-									onClick={() => item.isFolder && setCurrentFolder(item)}
+									onClick={() => {
+										if (item.isFolder) setCurrentFolder(item);
+									}}
 								>
 									<div className="flex items-center gap-2">
 										{(() => {
@@ -199,15 +205,16 @@ export function ItemsOverview({
 								<TableCell>
 									<ItemSizeCell file={item} userId={user?.id} />
 								</TableCell>
+								<TableCell>
+									{item.path}
+								</TableCell>
 								<TableCell className="relative text-right">
 									<ItemActionsDropdown
 										label={item.name}
 										fileId={item.id}
-										itemInstance={item}
-										setCurrentFolder={setCurrentFolder}
-										setRenameDialogOpen={setRenameDialogOpen}
-										setContextedItem={setContextedItem}
+										trashOpen={trashOpen}
 										setContentRefreshKey={setRefreshKey}
+										setSidebarRefreshKey={setSidebarRefreshKey}
 									/>
 								</TableCell>
 							</TableRow>
@@ -217,7 +224,6 @@ export function ItemsOverview({
 			);
 		}
 
-		/* Flex view */
 		if (view == "flex") {
 			return (
 				<div className="flex flex-wrap gap-4 p-4">
@@ -248,29 +254,26 @@ export function ItemsOverview({
 								<ContextMenuContent className="w-52">
 									<ContextMenuItem
 										inset
-										className="cursor-pointer"
-										onClick={() => setCurrentFolder(item)}
-										disabled={!item.isFolder}
+										className="cursor-pointer flex items-center gap-2"
+										disabled={restoring}
+										onClick={() => handleRestore({ item })}
 									>
-										Open
+										{restoring ? (
+											<>
+												<Loader2 className="w-4 h-4 animate-spin" />{" "}
+												Restoring...
+											</>
+										) : (
+											"Restore"
+										)}
 									</ContextMenuItem>
-									<ContextMenuItem inset className="cursor-pointer">
-										Download
-									</ContextMenuItem>
+
 									<ContextMenuItem
 										inset
 										className="cursor-pointer"
-										onClick={() => {
-											requestAnimationFrame(() => setRenameDialogOpen(true));
-										}}
+										variant="destructive"
 									>
-										Rename
-										<ContextMenuShortcut>f2</ContextMenuShortcut>
-									</ContextMenuItem>
-
-									<ContextMenuItem inset className="cursor-pointer">
-										Delete
-										<ContextMenuShortcut>del</ContextMenuShortcut>
+										Delete Permanently
 									</ContextMenuItem>
 
 									<ContextMenuSeparator />
@@ -291,5 +294,6 @@ export function ItemsOverview({
 				</div>
 			);
 		}
+
 	}
 }
